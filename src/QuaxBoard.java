@@ -3,10 +3,11 @@ import java.util.ArrayList;
 public class QuaxBoard {
     // Instance variables
     ArrayList<Tile> tiles;
+    boolean pieRuleEnabled;
 
     // Constructor
     public QuaxBoard(Theme boardTheme) {
-
+        pieRuleEnabled = true;
     }
 
     // Methods
