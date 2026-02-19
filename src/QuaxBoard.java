@@ -4,10 +4,12 @@ public class QuaxBoard {
     // Instance variables
     ArrayList<Tile> tiles;
     boolean pieRuleEnabled;
+    Turn turn;
 
     // Constructor
     public QuaxBoard(Theme boardTheme) {
         pieRuleEnabled = true;
+        turn = Turn.Player1;
     }
 
     // Methods
@@ -31,6 +33,7 @@ public class QuaxBoard {
         return null;
     }
 
+    public Turn getTurn(){return turn;}
     public void setPieRuleEnabled(boolean enabled) {
 
     }

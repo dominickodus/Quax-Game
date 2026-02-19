@@ -3,6 +3,8 @@ public class QuaxGame {
     int turnNum = 1;
     Controller player1Controller;
     Controller player2Controller;
+    QuaxBoard boardstate;
+
 
     // Constructor
     public QuaxGame(Controller player1Controller, Controller player2Controller) {
