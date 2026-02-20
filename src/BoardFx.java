@@ -94,6 +94,9 @@ public class BoardFx {
                 Button button = new Button();
                 button.setStyle("-fx-background-color: rgba(0, 0, 0, 0); " +
                         "-fx-pref-width: 40px; -fx-pref-height: 40px;");
+                button.setOnMouseClicked(event -> {
+                    button.setStyle(button.getStyle() + "-fx-background-image: url(\"/assets/images/Circle.png\");");
+                });
                 boardGrid.add(button, x + 1, y + 1);
             }
         }
