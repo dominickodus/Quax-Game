@@ -1,122 +1,177 @@
-import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
-
-
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.StrokeType;
 /*The purpose of this new class is to have a no co-existence of UI and Back-end code in QuaxBoard.
 * however, this class should be heavily linked to QuaxBoard */
 
 // feel free to delete and do another way if more efficient
 public class BoardFx {
 
-    private static String numToLetter(int num) {
-        switch (num) {
-            case 0:
-                return "A";
-                case 1:
-                    return "B";
-                    case 2:
-                        return "C";
-                        case 3:
-                            return "D";
-                            case 4:
-                                return "E";
-                                case 5:
-                                    return "F";
-                                    case 6:
-                                        return "G";
-                                        case 7:
-                                            return "H";
-                                            case 8:
-                                                return "I";
-                                                case 9:
-                                                    return "J";
-                                                    case 10:
-                                                        return "K";
-        }
-        return "";
-    }
+    private static final int N = 11;           // 11x11 octagon cells
+    private static final int V = 2 * N - 1;  // 21x21 visual grid (octagons + rhombi)
+
+    // Control how big the shapes are
+    private static final double OCT_SIZE = 24; // octagon radius
+    private static final double RHO_W = 21;    // rhombus half-width
+    private static final double RHO_H = 21;    // rhombus half-height
+
     private BorderPane root;
-    private Label turnLabel; //we declare all our different text labels, screen components, ui parts, etc.
+    private Label turnLabel;
+
+    // store references so later you can render model properly
+    private final StackPane[][] octagonNodes = new StackPane[N][N];
+
+    // Helper for column label.
+    private static String numToLetter(int i) {
+        return String.valueOf((char) ('A' + i));
+    }
 
     public BoardFx(Stage stage, QuaxBoard boardState) {
 
         root = new BorderPane();
         root.setStyle("-fx-background-color: #e0da94;");
 
-        //TITLE
+        // TITLE
         Label title = new Label("QUAX GAME");
         title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
-        //TURN INDICATOR (UNPOLISHED)
-        turnLabel = new Label();
-        turnLabel.setStyle("-fx-font-size: 18px;");
-        root.setBottom(turnLabel);
-
-        //SET UP
         VBox topSection = new VBox(title);
         topSection.setSpacing(10);
-        topSection.setStyle("-fx-alignment: center; -fx-padding: 20;");
+        topSection.setStyle("-fx-alignment: center; -fx-padding: 5 20 5 20;");
         root.setTop(topSection);
 
-        //root.setTop(topSection);
-        Scene scene = new Scene(root, 800, 600); //set dimensions
+        // TURN INDICATOR
+        turnLabel = new Label();
+        turnLabel.setStyle("-fx-font-size: 18px; -fx-padding: 10;");
+        root.setBottom(turnLabel);
 
-        //title
-        stage.setTitle("Quax Game (Player vs. Player)");
-        stage.setScene(scene);
-
-        /* EACH METHOD FOR DISPLAYING COMPONENTS UNDER  HERE */
-
-        // Grid
+        // BOARD GRID (VIS+1 because row 0 and col 0 are for labels)
         GridPane boardGrid = new GridPane();
-        boardGrid.setGridLinesVisible(true);
-        boardGrid.setStyle("-fx-alignment: center;");
-        for (int i = 0; i < 11; i++) {
-            Label numLabel = new Label(String.format("%d", i + 1));
-            Label letterLabel = new Label(numToLetter(i));
-            numLabel.setPrefSize(40, 40);
-            letterLabel.setPrefSize(40, 40);
-            numLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-alignment: center;");
-            letterLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-alignment: center;");
-            boardGrid.add(numLabel, 0, i + 1);
-            boardGrid.add(letterLabel, i + 1, 0);
+        boardGrid.setAlignment(Pos.CENTER);
+        boardGrid.setHgap(0);
+        boardGrid.setVgap(0);
+        boardGrid.setGridLinesVisible(false); // turn on if debugging
+
+
+        // Top labels A–K aligned over octagons
+        for (int x = 0; x < N; x++) {
+            Label letterLabel = new Label(numToLetter(x));
+            letterLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+            StackPane wrap = new StackPane(letterLabel);
+            wrap.setMinSize(24, 35);
+            boardGrid.add(wrap, 1 + 2 * x, 0); //Place labels at col 1, 3 ,5 etc
         }
 
-        for (int x = 0; x < 11; x++) {
-            for (int y = 0; y < 11; y++) {
-                Button button = new Button();
-                button.setStyle("-fx-background-color: rgba(0, 0, 0, 0); " +
-                        "-fx-pref-width: 40px; -fx-pref-height: 40px;");
-                button.setOnMouseClicked(event -> {
-                    button.setStyle(button.getStyle() + "-fx-background-image: url(\"/assets/images/Circle.png\");");
-                });
-                boardGrid.add(button, x + 1, y + 1);
+        // Left labels 1–11 aligned beside octagons
+        for (int y = 0; y < N; y++) {
+            Label numLabel = new Label(String.valueOf(y + 1));
+            numLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+            StackPane wrap = new StackPane(numLabel);
+            wrap.setMinSize(35, 24);
+
+            boardGrid.add(wrap, 0, 1 + 2 * y); // Place labels at col 1,3, 5
+        }
+
+        // Place octagons and rhombi in a 21x21 visual grid
+        for (int vx = 0; vx < V; vx++) {
+            for (int vy = 0; vy < V; vy++) {
+
+                int col = vx + 1; // +1 because labels occupy row/col 0
+                int row = vy + 1;
+
+                // Octagon cells at even-even coordinates
+                if (vx % 2 == 0 && vy % 2 == 0) {
+                    int bx = vx / 2;
+                    int by = vy / 2;
+
+                    StackPane cell = new StackPane();
+                    cell.setMinSize(36, 36);
+
+                    Polygon oct = createOctagon(OCT_SIZE);
+                    oct.getStyleClass().add("octagon");
+
+                    cell.getChildren().add(oct);
+
+                    // Sprint 1: click places a "stone"
+                    final int fx = bx;
+                    final int fy = by;
+                    cell.setOnMouseClicked(e -> {
+                        // later: call controller -> validate -> update model -> render()
+                        oct.setFill(Color.WHITE); // for now: always white stone
+                    });
+
+                    octagonNodes[bx][by] = cell;
+                    boardGrid.add(cell, col, row);
+                }
+
+                // Rhombic connector cells at odd-odd coordinates
+                else if (vx % 2 == 1 && vy % 2 == 1) {
+                    StackPane cell = new StackPane();
+                    cell.setMinSize(24, 24);
+
+                    Polygon rh = createRhombus(RHO_W, RHO_H);
+                    rh.setFill(Color.rgb(0, 0, 0, 0.08)); // faint
+                    rh.setStroke(Color.rgb(0, 0, 0, 0.35));
+                    rh.setStrokeWidth(1);
+
+                    cell.getChildren().add(rh);
+                    boardGrid.add(cell, col, row);
+                }
+
+                // spacer cells (odd-even or even-odd)
             }
         }
+
         root.setCenter(boardGrid);
 
-        //Turn
+        // Turn display
         displayTurn(boardState);
 
+        Scene scene = new Scene(root, 900, 750);
+        stage.setTitle("Quax Game (Player vs. Player)");
+        stage.setScene(scene);
         stage.show();
     }
 
-    public void displayTurn(QuaxBoard boardState) {
-        String turnText =
-                boardState.getTurn() == Turn.Player1 ? "WHITE" : "BLACK";
 
-        this.turnLabel.setText("CURRENT TURN: " + turnText);
-    }
+        private static Polygon createOctagon(double r) {
+            Polygon p = new Polygon();
+            for (int i = 0; i < 8; i++) {
+                double angle = Math.toRadians(22.5 + i * 45.0);
+                double x = r * Math.cos(angle);
+                double y = r * Math.sin(angle);
+                p.getPoints().addAll(x, y);
+            }
+            p.setFill(Color.rgb(0, 0, 0, 0.03));
+            p.setStroke(Color.rgb(0, 0, 0, 0.55));
+            p.setStrokeWidth(1.5);
+            p.setStrokeType(StrokeType.INSIDE);
+            return p;
+        }
 
+        private static Polygon createRhombus(double halfW, double halfH) {
+            Polygon p = new Polygon(
+                    0.0, -halfH,
+                    halfW, 0.0,
+                    0.0, halfH,
+                    -halfW, 0.0
+            );
+            return p;
+        }
 
-    public BorderPane getRoot() {
-        return root;
-    }
+        public void displayTurn(QuaxBoard boardState) {
+            String turnText = (boardState.getTurn() == Turn.Player1) ? "WHITE" : "BLACK";
+            this.turnLabel.setText("CURRENT TURN: " + turnText);
+        }
+
+        public BorderPane getRoot() {
+            return root;
+        }
 }
