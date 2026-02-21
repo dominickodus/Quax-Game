@@ -16,7 +16,7 @@ public class BoardFx {
     private static final int V = 2 * N - 1;  // 21x21 visual grid (octagons + rhombi)
 
     // Control how big the shapes are
-    private static final double OCT_SIZE = 24; // octagon radius
+    private static final double OCT_SIZE = 30; // octagon radius
     private static final double RHO_W = 21;    // rhombus half-width
     private static final double RHO_H = 21;    // rhombus half-height
 
