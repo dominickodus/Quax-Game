@@ -102,10 +102,18 @@ public class BoardFx {
                     // Sprint 1: click places a "stone"
                     final int fx = bx;
                     final int fy = by;
+
+
+
+                    //When a cell (Octagon only for now) is Clicked
                     cell.setOnMouseClicked(e -> {
-                        // later: call controller -> validate -> update model -> render()
-                        oct.setFill(Color.WHITE); // for now: always white stone
+
+                        // later: Rhombus compatibility
+
+                        fillOctagon(oct, boardState);
+                        displayTurn(boardState); //display current turn each time
                     });
+
 
                     octagonNodes[bx][by] = cell;
                     boardGrid.add(cell, col, row);
@@ -131,7 +139,8 @@ public class BoardFx {
 
         root.setCenter(boardGrid);
 
-        // Turn display
+
+        //initial display for Turn 1;
         displayTurn(boardState);
 
         Scene scene = new Scene(root, 900, 750);
@@ -164,6 +173,16 @@ public class BoardFx {
                     -halfW, 0.0
             );
             return p;
+        }
+
+        //Fills octagon with according to Board State
+         public void fillOctagon(Polygon oct, QuaxBoard boardState) {
+            Turn lastTurn = boardState.getTurn();
+
+             //switches turn after placed, if valid move
+            QuaxGame.placeStone(boardState);
+
+            oct.setFill(lastTurn == Turn.Player1 ? Color.WHITE : Color.BLACK);
         }
 
         public void displayTurn(QuaxBoard boardState) {

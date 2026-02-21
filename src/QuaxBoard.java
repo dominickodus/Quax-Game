@@ -3,8 +3,8 @@ import java.util.ArrayList;
 public class QuaxBoard {
     // Instance variables
     ArrayList<Tile> tiles;
-    boolean pieRuleEnabled;
-    Turn turn;
+     private boolean pieRuleEnabled;
+     private Turn turn;
 
     // Constructor
     public QuaxBoard(Theme boardTheme) {
@@ -34,6 +34,10 @@ public class QuaxBoard {
     }
 
     public Turn getTurn(){return turn;}
+
+    public void switchTurn() {
+        turn = (turn == Turn.Player1) ? Turn.Player2 : Turn.Player1;
+    }
     public void setPieRuleEnabled(boolean enabled) {
 
     }
