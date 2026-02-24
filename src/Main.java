@@ -12,9 +12,11 @@ public class Main extends Application {
         /*only using STANDARD for now,
         need to find way to switch themes AFTER board is rendered
          */
-        QuaxBoard boardState = new QuaxBoard(Theme.STANDARD);
+        Theme selectedTheme = ThemeSelector.promptThemeSelection(stage);
+        ThemeSet themeSet = new ThemeSet(selectedTheme);
+        QuaxBoard boardState = new QuaxBoard(selectedTheme);
 
-        new BoardFx(stage, boardState); //BLANK WINDOW
+        new BoardFx(stage, boardState, themeSet); //BLANK WINDOW
     }
 
     public static void main(String[] args) {

@@ -1,3 +1,4 @@
 public enum Theme {
-    STANDARD
+    Standard,
+    Colourful
 }

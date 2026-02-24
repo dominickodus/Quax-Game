@@ -12,6 +12,7 @@ import javafx.scene.shape.StrokeType;
 // feel free to delete and do another way if more efficient
 public class BoardFx {
 
+    private ThemeSet theme;
     private static final int N = 11;           // 11x11 octagon cells
     private static final int V = 2 * N - 1;  // 21x21 visual grid (octagons + rhombi)
 
@@ -31,14 +32,16 @@ public class BoardFx {
         return String.valueOf((char) ('A' + i));
     }
 
-    public BoardFx(Stage stage, QuaxBoard boardState) {
+    public BoardFx(Stage stage, QuaxBoard boardState, ThemeSet theme) {
+        this.theme = theme;
 
         root = new BorderPane();
-        root.setStyle("-fx-background-color: #e0da94;");
+        root.setBackground(theme.getBackground());
 
         // TITLE
         Label title = new Label("QUAX GAME");
         title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+        title.setTextFill(theme.getTextColour());
 
         VBox topSection = new VBox(title);
         topSection.setSpacing(10);
@@ -48,6 +51,7 @@ public class BoardFx {
         // TURN INDICATOR
         turnLabel = new Label();
         turnLabel.setStyle("-fx-font-size: 18px; -fx-padding: 10;");
+        turnLabel.setTextFill(theme.getTextColour());
         root.setBottom(turnLabel);
 
         // BOARD GRID (VIS+1 because row 0 and col 0 are for labels)
@@ -182,12 +186,12 @@ public class BoardFx {
              //switches turn after placed, if valid move
             QuaxGame.placeStone(boardState);
 
-            oct.setFill(lastTurn == Turn.Player1 ? Color.WHITE : Color.BLACK);
+            oct.setFill(lastTurn == Turn.Player1 ? theme.getPlayer1FillColour() : theme.getPlayer2FillColour());
         }
 
         public void displayTurn(QuaxBoard boardState) {
-            String turnText = (boardState.getTurn() == Turn.Player1) ? "WHITE" : "BLACK";
-            this.turnLabel.setText("CURRENT TURN: " + turnText);
+            String turnText = (boardState.getTurn() == Turn.Player1) ? theme.getPlayer1ColourText() : theme.getPlayer2ColourText();
+            this.turnLabel.setText(turnText + " to move");
         }
 
         public BorderPane getRoot() {
