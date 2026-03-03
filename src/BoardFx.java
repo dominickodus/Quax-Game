@@ -23,7 +23,9 @@ public class BoardFx {
     private static final double RHO_H = 21;    // rhombus half-height
 
     private BorderPane root;
-    private Label turnLabel;
+    private Polygon turnOctagon;
+    private Polygon turnRhombus;
+    private Label turnText;
 
     // store references so later you can render model properly
     private final StackPane[][] octagonNodes = new StackPane[N][N];
@@ -41,7 +43,8 @@ public class BoardFx {
         root.setBackground(theme.getBackground());
 
         // TITLE
-        Label title = new Label("QUAX GAME");
+        Label title = new Label("QUAX (Human V Human)");
+
         title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
         title.setTextFill(theme.getTextColour());
 
@@ -51,10 +54,22 @@ public class BoardFx {
         root.setTop(topSection);
 
         // TURN INDICATOR
-        turnLabel = new Label();
-        turnLabel.setStyle("-fx-font-size: 18px; -fx-padding: 10;");
-        turnLabel.setTextFill(theme.getTextColour());
-        root.setBottom(turnLabel);
+        HBox turnBox = new HBox(10);
+        turnBox.setAlignment(Pos.CENTER);
+        turnBox.setStyle("-fx-padding: 10;");
+
+        turnOctagon = createOctagon(12);
+        turnRhombus = createRhombus(10, 10);
+
+        Label arrow = new Label("→");
+        arrow.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        turnText = new Label();
+
+        turnText.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        turnBox.getChildren().addAll(turnOctagon, turnRhombus, turnText);
+        root.setBottom(turnBox);
 
         // BOARD GRID (VIS+1 because row 0 and col 0 are for labels)
         GridPane boardGrid = new GridPane();
@@ -191,10 +206,16 @@ public class BoardFx {
              oct.setFill(lastTurn == Turn.Player1 ? theme.getPlayer1FillColour() : theme.getPlayer2FillColour());
         }
 
-        public void displayTurn(QuaxBoard boardState) {
-            String turnText = (boardState.getTurn() == Turn.Player1) ? theme.getPlayer1ColourText() : theme.getPlayer2ColourText();
-            this.turnLabel.setText(turnText + " to move");
-        }
+
+
+    public void displayTurn(QuaxBoard boardState) {
+        boolean blackToPlay = (boardState.getTurn() == Turn.Player1); // based on your mapping below
+        Color c = blackToPlay ? Color.BLACK : Color.WHITE;
+
+        turnOctagon.setFill(c);
+        turnRhombus.setFill(c);
+        turnText.setText((blackToPlay ? "BLACK" : "WHITE") + " to play");
+    }
 
         public BorderPane getRoot() {
             return root;
