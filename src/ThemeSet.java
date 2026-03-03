@@ -26,11 +26,6 @@ public class ThemeSet {
                 background = new Background(
                         new BackgroundFill(Color.rgb(114, 191, 109), null, null)
                 );
-                player1FillColour = Color.RED;
-                player2FillColour = Color.BLUE;
-                player1ColourText = "RED";
-                player2ColourText = "BLUE";
-                textColour = Color.BLACK;
                 break;
         }
     }
