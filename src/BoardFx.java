@@ -207,7 +207,7 @@ public class BoardFx {
              //switches turn after placed, if valid move
             QuaxGame.placeStone(boardState);
 
-             oct.setFill(lastTurn == Turn.Player1 ? theme.getPlayer1FillColour() : theme.getPlayer2FillColour());
+             oct.setFill(lastTurn == Turn.Player1 ?Color.BLACK: Color.WHITE );
         }
 
 
