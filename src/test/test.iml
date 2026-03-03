@@ -24,5 +24,9 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="Quax" scope="TEST" />
+    <orderEntry type="library" name="lib" level="project" />
+    <orderEntry type="library" name="testfx-junit5-4.0.18 (1)" level="project" />
+    <orderEntry type="library" name="testfx-core-4.0.18" level="project" />
+    <orderEntry type="library" name="hamcrest-2.2" level="project" />
   </component>
 </module>

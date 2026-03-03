@@ -68,6 +68,10 @@ public class BoardFx {
 
         turnText.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
+        turnOctagon.setId("turnOctagon");
+        turnRhombus.setId("turnRhombus");
+        turnText.setId("turnText");
+
         turnBox.getChildren().addAll(turnOctagon, turnRhombus, turnText);
         root.setBottom(turnBox);
 
