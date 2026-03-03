@@ -182,14 +182,13 @@ public class BoardFx {
              //switches turn after placed, if valid move
             QuaxGame.placeStone(boardState);
 
-            oct.setFill(lastTurn == Turn.Player1 ? Color.WHITE : Color.BLACK);
+             oct.setFill(lastTurn == Turn.Player1 ? Color.BLACK : Color.WHITE);
         }
 
-        public void displayTurn(QuaxBoard boardState) {
-            String turnText = (boardState.getTurn() == Turn.Player1) ? "WHITE" : "BLACK";
-            this.turnLabel.setText("CURRENT TURN: " + turnText);
-        }
-
+    public void displayTurn(QuaxBoard boardState) {
+        String turnText = (boardState.getTurn() == Turn.Player1) ? "BLACK" : "WHITE";
+        this.turnLabel.setText( turnText + " TO PLAY");
+    }
         public BorderPane getRoot() {
             return root;
         }
