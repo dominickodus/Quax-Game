@@ -1,3 +1,4 @@
+
 public class QuaxGame {
     // Instance variables
     int turnNum = 1;
@@ -18,12 +19,17 @@ public class QuaxGame {
 
     }
 
-    public static void placeStone(QuaxBoard board){
+    public static boolean placeStone(QuaxBoard board, Colour colour){
 
         /*
-        PLACEMENT VALIDATION AND WIN CHECKS HERE, LATER
+        WIN CHECKS HERE, LATER
          */
 
+        if(colour != Colour.NULL){ //return if position occupied
+            return false;
+        }
+
         board.switchTurn();
+        return true;
     }
 }

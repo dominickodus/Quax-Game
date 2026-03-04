@@ -1,11 +1,12 @@
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.layout.*;
-import javafx.stage.Stage;
 import javafx.scene.control.Label;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
+import javafx.stage.Stage;
 /*The purpose of this new class is to have a no co-existence of UI and Back-end code in QuaxBoard.
 * however, this class should be heavily linked to QuaxBoard */
 
@@ -205,9 +206,28 @@ public class BoardFx {
             Turn lastTurn = boardState.getTurn();
 
              //switches turn after placed, if valid move
-            QuaxGame.placeStone(boardState);
 
-             oct.setFill(lastTurn == Turn.Player1 ?Color.BLACK: Color.WHITE );
+             //get current colour
+             Colour colour;
+             Paint paint = oct.getFill();
+
+             if (paint.equals(Color.WHITE)) {
+                 colour = Colour.WHITE;
+             }
+             else if (paint.equals(Color.BLACK)) {
+                 colour = Colour.BLACK;
+             }
+             else {
+                 colour = Colour.NULL;
+             }
+
+             boolean canPlace = QuaxGame.placeStone(boardState, colour);
+
+             if(!canPlace){
+                 return; //FOR NOW , NO MESSAGE YET
+             }
+
+             oct.setFill(lastTurn == Turn.Player1 ? Color.BLACK: Color.WHITE );
         }
 
 
