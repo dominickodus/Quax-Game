@@ -51,6 +51,7 @@ public class BoardFx {
         this.theme = theme;
 
         root = new BorderPane();
+        root.setId("root");
         root.setBackground(theme.getBackground());
 
         // TITLE
@@ -160,6 +161,7 @@ public class BoardFx {
                     cell.setMinSize(24, 24);
 
                     Polygon rh = createRhombus(RHO_W, RHO_H);
+                    rh.getStyleClass().add("rhombus");
                     rh.setFill(Color.rgb(0, 0, 0, 0.08));
                     rh.setStroke(Color.rgb(0, 0, 0, 0.35));
                     rh.setStrokeWidth(1);

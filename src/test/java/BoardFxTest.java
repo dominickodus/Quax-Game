@@ -1,11 +1,16 @@
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import org.testfx.framework.junit5.ApplicationTest;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,5 +56,18 @@ public class BoardFxTest extends ApplicationTest {
         assertEquals(0.0, fill.getRed(), 0.01);
         assertEquals(0.0, fill.getGreen(), 0.01);
         assertEquals(0.0, fill.getBlue(), 0.01);
+    }
+
+    // Custom feature
+    // Check themes apply correctly
+    @Test
+    void ThemeAppliesBackground() {
+        BorderPane borderPane = lookup("#root").query();
+        Background background = borderPane.getBackground();
+        List<BackgroundFill> fills = background.getFills();
+        Paint fill = fills.get(0).getFill();
+        if (fill instanceof Color color) {
+            boolean isEqual = color.equals(Color.rgb(224, 218, 148));
+        }
     }
 }

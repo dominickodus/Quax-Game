@@ -100,32 +100,14 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../../../../../Javafx/javafx-sdk-21.0.10/lib" />
+          <root url="file://C:/../Javafx/javafx-sdk-21.0.10/lib" />
         </CLASSES>
         <JAVADOC />
         <NATIVE>
-          <root url="file://$MODULE_DIR$/../../../../../Javafx/javafx-sdk-21.0.10/lib" />
+          <root url="file://C:/../Javafx/javafx-sdk-21.0.10/lib" />
         </NATIVE>
         <SOURCES />
-        <jarDirectory url="file://$MODULE_DIR$/../../../../../Javafx/javafx-sdk-21.0.10/lib" recursive="false" />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/testfx-core-4.0.16-alpha.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/testfx-junit5-4.0.16-alpha.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
+        <jarDirectory url="file://C:/../Javafx/javafx-sdk-21.0.10/lib" recursive="false" />
       </library>
     </orderEntry>
   </component>
