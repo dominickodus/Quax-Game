@@ -7,10 +7,18 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
-/*The purpose of this new class is to have a no co-existence of UI and Back-end code in QuaxBoard.
-* however, this class should be heavily linked to QuaxBoard */
 
-// feel free to delete and do another way if more efficient
+/**
+ * JavaFX view for the Quax board.
+ * BoardFx is responsible only for UI:
+ *  - Rendering tile grid
+ *  - Displaying coordinate labels and current turn indicators
+ *  - Forwarding clicks to QuaxGame and updating board.
+ *
+ *  The actual game state is stored in QuaxBoard.
+ * */
+
+
 public class BoardFx {
 
     private ThemeSet theme;
@@ -18,12 +26,14 @@ public class BoardFx {
     private static final int N = 11;           // 11x11 octagon cells
     private static final int V = 2 * N - 1;  // 21x21 visual grid (octagons + rhombi)
 
-    // Control how big the shapes are
+    // Shape sizing
     private static final double OCT_SIZE = 30; // octagon radius
     private static final double RHO_W = 21;    // rhombus half-width
     private static final double RHO_H = 21;    // rhombus half-height
 
     private BorderPane root;
+
+    // Turn indicator UI components
     private Polygon turnOctagon;
     private Polygon turnRhombus;
     private Label turnText;
@@ -73,7 +83,7 @@ public class BoardFx {
         turnRhombus.setId("turnRhombus");
         turnText.setId("turnText");
 
-        turnBox.getChildren().addAll(turnOctagon, turnRhombus, turnText);
+        turnBox.getChildren().addAll(turnOctagon, turnRhombus, arrow, turnText);
         root.setBottom(turnBox);
 
         // BOARD GRID (VIS+1 because row 0 and col 0 are for labels)
@@ -114,6 +124,8 @@ public class BoardFx {
 
                 // Octagon cells at even-even coordinates
                 if (vx % 2 == 0 && vy % 2 == 0) {
+
+                    // Convert visual grid coordinates to board coordinates
                     int bx = vx / 2;
                     int by = vy / 2;
 
@@ -125,19 +137,16 @@ public class BoardFx {
 
                     cell.getChildren().add(oct);
 
-                    // Sprint 1: click places a "stone"
-                    final int fx = bx;
-                    final int fy = by;
 
-
-
-                    //When a cell (Octagon only for now) is Clicked
+                    // On click: forward octagonal placement request to QuaxGame, then update UI
                     cell.setOnMouseClicked(e -> {
+                        boolean ok = QuaxGame.placeStone(boardState, bx, by);
+                        if (!ok) return;
 
-                        // later: Rhombus compatibility
+                        Colour owner = boardState.getStone(bx, by);
+                        oct.setFill(owner == Colour.BLACK ? Color.BLACK : Color.WHITE);
 
-                        fillOctagon(oct, boardState);
-                        displayTurn(boardState); //display current turn each time
+                        displayTurn(boardState);
                     });
 
 
@@ -145,28 +154,42 @@ public class BoardFx {
                     boardGrid.add(cell, col, row);
                 }
 
-                // Rhombic connector cells at odd-odd coordinates
+                // Rhombic tiles appear between four octagons at odd - odd coordinates
                 else if (vx % 2 == 1 && vy % 2 == 1) {
                     StackPane cell = new StackPane();
                     cell.setMinSize(24, 24);
 
                     Polygon rh = createRhombus(RHO_W, RHO_H);
-                    rh.setFill(Color.rgb(0, 0, 0, 0.08)); // faint
+                    rh.setFill(Color.rgb(0, 0, 0, 0.08));
                     rh.setStroke(Color.rgb(0, 0, 0, 0.35));
                     rh.setStrokeWidth(1);
 
                     cell.getChildren().add(rh);
+
+                    // Convert visual coordinates to rhombus grid coordinates
+                    final int rx = vx / 2;
+                    final int ry = vy / 2;
+
+                    // On click: forward rhombus placement request to QuaxGame, update UI
+                    cell.setOnMouseClicked(e -> {
+                        boolean ok = QuaxGame.placeRhombus(boardState, rx, ry);
+                        if (!ok) return;
+
+                        Colour owner = boardState.getRhombus(rx, ry);
+                        rh.setFill(owner == Colour.BLACK ? Color.BLACK : Color.WHITE);
+
+                        displayTurn(boardState);
+                    });
+
                     boardGrid.add(cell, col, row);
                 }
-
                 // spacer cells (odd-even or even-odd)
             }
         }
 
         root.setCenter(boardGrid);
 
-
-        //initial display for Turn 1;
+        // Initial display for Turn 1;
         displayTurn(boardState);
 
         Scene scene = new Scene(root, 900, 750);
@@ -198,41 +221,11 @@ public class BoardFx {
                     0.0, halfH,
                     -halfW, 0.0
             );
-            return p;
-        }
-
-        //Fills octagon with according to Board State
-         public void fillOctagon(Polygon oct, QuaxBoard boardState) {
-            Turn lastTurn = boardState.getTurn();
-
-             //switches turn after placed, if valid move
-
-             //get current colour
-             Colour colour;
-             Paint paint = oct.getFill();
-
-             if (paint.equals(Color.WHITE)) {
-                 colour = Colour.WHITE;
-             }
-             else if (paint.equals(Color.BLACK)) {
-                 colour = Colour.BLACK;
-             }
-             else {
-                 colour = Colour.NULL;
-             }
-
-             boolean canPlace = QuaxGame.placeStone(boardState, colour);
-
-             if(!canPlace){
-                 return; //FOR NOW , NO MESSAGE YET
-             }
-
-             oct.setFill(lastTurn == Turn.Player1 ? Color.BLACK: Color.WHITE );
-        }
+            return p;        }
 
 
-
-    public void displayTurn(QuaxBoard boardState) {
+    // Update turn indicator based on current players turn
+        public void displayTurn(QuaxBoard boardState) {
         boolean blackToPlay = (boardState.getTurn() == Turn.Player1); // based on your mapping below
         Color c = blackToPlay ? Color.BLACK : Color.WHITE;
 

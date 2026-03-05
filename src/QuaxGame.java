@@ -1,35 +1,31 @@
+/**
+ *  This acts as the rules layer for the game
+ *
+ *  QuaxGame acts between the UI (BoardFx) and the board state (QuaxBoard)>
+ *  At the moment it mainly forwrads move requests to QuaxBoard, but will contain
+ *  higher level game logic such as win detection etc.
+ */
 
 public class QuaxGame {
-    // Instance variables
-    int turnNum = 1;
-    Controller player1Controller;
-    Controller player2Controller;
-    QuaxBoard board;
 
-
-    // Constructor
-    public QuaxGame(Controller player1Controller, Controller player2Controller, QuaxBoard board) {
-        this.player1Controller = player1Controller;
-        this.player2Controller = player2Controller;
-        this.board = board;
+    // Places an octagon stone at (x,y)
+    public static boolean placeStone(QuaxBoard board, int x, int y) {
+        return board.placeStoneAt(x, y);
     }
 
-    // Methods
-    public void start() {
-
+    // Places a rombus stone at (x,y)
+    public static boolean placeRhombus(QuaxBoard board, int x, int y) {
+        return board.placeRhombusAt(x, y);
     }
 
-    public static boolean placeStone(QuaxBoard board, Colour colour){
-
-        /*
-        WIN CHECKS HERE, LATER
-         */
-
-        if(colour != Colour.NULL){ //return if position occupied
-            return false;
-        }
-
-        board.switchTurn();
-        return true;
+    // Placeholder for win detection
+    public static boolean checkWin(QuaxBoard board, Colour player) {
+        return false;
     }
+
+    // Placeholder for pie rule logic
+    public static boolean applyPieRule(QuaxBoard board) {
+        return false;
+    }
+
 }

@@ -21,7 +21,7 @@ public class Tile {
         this.owner = owner;
     }
 
-    public int getOwner(int owner) {
+    public int getOwner() {
         return owner;
     }
 
