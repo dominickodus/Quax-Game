@@ -38,7 +38,6 @@ public class BoardFxTest extends ApplicationTest {
         Label turnText = lookup("#turnText").query();
         assertTrue(turnText.getText().contains("BLACK"));
     }
-
     /**
      * SR2 – First placed stone is BLACK
      */
