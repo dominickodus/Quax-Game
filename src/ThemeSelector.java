@@ -13,11 +13,13 @@ public class ThemeSelector {
         ButtonType classicButton = new ButtonType("Classic");
         ButtonType alternateButton = new ButtonType("Alternate");
         ButtonType moreButton = new ButtonType("More");
+        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
         dialog.getDialogPane().getButtonTypes().addAll(
                 classicButton,
                 alternateButton,
-                moreButton
+                moreButton,
+                cancelButton
         );
 
         Optional<ButtonType> result = dialog.showAndWait();

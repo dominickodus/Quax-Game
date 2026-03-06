@@ -11,6 +11,9 @@ public class Main extends Application {
         need to find way to switch themes AFTER board is rendered
          */
         Theme selectedTheme = ThemeSelector.promptThemeSelection(stage);
+        if (selectedTheme == null) {
+            System.exit(0);
+        }
         ThemeSet themeSet = new ThemeSet(selectedTheme);
         QuaxBoard boardState = new QuaxBoard(selectedTheme);
 
