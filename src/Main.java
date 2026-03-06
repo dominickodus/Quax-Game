@@ -7,9 +7,6 @@ public class Main extends Application {
 
     public void start(Stage stage) {
 
-        /*only using STANDARD for now,
-        need to find way to switch themes AFTER board is rendered
-         */
         Theme selectedTheme = ThemeSelector.promptThemeSelection(stage);
         if (selectedTheme == null) {
             System.exit(0);
@@ -17,7 +14,7 @@ public class Main extends Application {
         ThemeSet themeSet = new ThemeSet(selectedTheme);
         QuaxBoard boardState = new QuaxBoard(selectedTheme);
 
-        new BoardFx(stage, boardState, themeSet); //BLANK WINDOW
+        new BoardFx(stage, boardState, themeSet);
     }
 
     public static void main(String[] args) {

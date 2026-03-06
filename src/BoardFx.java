@@ -3,7 +3,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
@@ -96,7 +95,6 @@ public class BoardFx {
         boardGrid.setHgap(0);
         boardGrid.setVgap(0);
         boardGrid.setGridLinesVisible(false); // turn on if debugging
-
 
         // Top labels A–K aligned over octagons
         for (int x = 0; x < N; x++) {
