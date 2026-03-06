@@ -6,14 +6,14 @@ public class QuaxBoardTest {
 
     //SR 2.1
     @Test
-    void initialTurnIsPlayer1() {
+    void test_SR2_initialTurnIsPlayer1() {
         QuaxBoard board = new QuaxBoard(null);
         assertEquals(Turn.Player1, board.getTurn());
     }
 
     //SR 2.1 + 2.2
     @Test
-    void switchTurnToggles() {
+    void test_SR2_switchTurnToggles() {
         QuaxBoard board = new QuaxBoard(null);
 
         board.switchTurn();
@@ -25,7 +25,7 @@ public class QuaxBoardTest {
 
     //SR 2.1 + 2.2 consistency
     @Test
-    void multipleTurnSwitches() {
+    void test_SR2_multipleTurnSwitches() {
         QuaxBoard board = new QuaxBoard(null);
 
         for (int i = 0; i < 10; i++) {

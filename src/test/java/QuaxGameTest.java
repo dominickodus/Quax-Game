@@ -7,7 +7,7 @@ public class QuaxGameTest {
 
     //SR2
     @Test
-    void placeStoneSwitchesTurn() {
+    void test_SR2placeStoneSwitchesTurn() {
         QuaxBoard board = new QuaxBoard(null);
 
         assertEquals(Turn.Player1, board.getTurn());
@@ -19,7 +19,7 @@ public class QuaxGameTest {
 
     //SR2
     @Test
-    void PlaceStoneAlternateTurns() {
+    void test_SR2_PlaceStoneAlternateTurns() {
         QuaxBoard board = new QuaxBoard(null);
 
         QuaxGame.placeStone(board, 0, 0);
@@ -31,7 +31,7 @@ public class QuaxGameTest {
 
     // SR5/6
     @Test
-    void InvalidPlacementRejected() {
+    void test_SR5_InvalidPlacementRejected() {
         QuaxBoard board = new QuaxBoard(null);
 
         QuaxGame.placeStone(board, 0, 0); // Now player 2's turn
@@ -43,7 +43,7 @@ public class QuaxGameTest {
     // SR 5/6
     // Tests rhombic stones with upper left / lower right stones
     @Test
-    void RhombicStonePlacement1() {
+    void test_SR5_RhombicStonePlacement1() {
         QuaxBoard board = new QuaxBoard(null);
 
         QuaxGame.placeStone(board, 0, 0); // Player 1
@@ -73,7 +73,7 @@ public class QuaxGameTest {
     // SR 5/6
     // Assert rhombuses must be placed between octagonal stones
     @Test
-    void InvalidRhombicStonePlacement() {
+    void test_SR5_InvalidRhombicStonePlacement() {
         QuaxBoard board = new QuaxBoard(null);
         QuaxGame.placeRhombus(board, 0, 0); // Invalid, should be player 1's turn still
         assertEquals(Turn.Player1, board.getTurn());
@@ -82,7 +82,7 @@ public class QuaxGameTest {
     // SR 5/6
     // Assert rhombus cannot be placed on an occupied rhombus
     @Test
-    void RhombicStoneValidation() {
+    void test_SR5_RhombicStoneValidation() {
         QuaxBoard board = new QuaxBoard(null);
 
         QuaxGame.placeStone(board, 0, 0); // Player 1

@@ -2,6 +2,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -13,15 +14,14 @@ import org.testfx.framework.junit5.ApplicationTest;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class BoardFxTest extends ApplicationTest {
 
     @Override
     public void start(Stage stage) {
-        ThemeSet themeSet = new ThemeSet(Theme.Standard);
+        ThemeSet themeSet = new ThemeSet(Theme.Classic);
         QuaxBoard board = new QuaxBoard(null);
         new BoardFx(stage, board, themeSet);
     }
@@ -61,13 +61,36 @@ public class BoardFxTest extends ApplicationTest {
     // Custom feature
     // Check themes apply correctly
     @Test
-    void ThemeAppliesBackground() {
+    void test_Custom_ThemeAppliesBackground() {
         BorderPane borderPane = lookup("#root").query();
         Background background = borderPane.getBackground();
         List<BackgroundFill> fills = background.getFills();
         Paint fill = fills.get(0).getFill();
         if (fill instanceof Color color) {
-            boolean isEqual = color.equals(Color.rgb(224, 218, 148));
+            assertEquals(Color.rgb(224, 218, 148), color);
         }
+    }
+
+    //Custom Feature
+    //Test that custom boards apply background image.
+    @Test
+    void test_Custom_themeAppliesImageBackground() {
+
+        interact(() -> {
+            ThemeSet themeSet = new ThemeSet(Theme.Jungle);
+            QuaxBoard board = new QuaxBoard(null);
+            new BoardFx((Stage) lookup("#root").query().getScene().getWindow(), board, themeSet);
+        });
+
+        BorderPane borderPane = lookup("#root").query();
+
+        Background background = borderPane.getBackground();
+        List<BackgroundImage> images = background.getImages();
+
+        assertFalse(images.isEmpty());
+
+        String url = images.get(0).getImage().getUrl();
+
+        assertTrue(url.contains("JungleBackground.png"));
     }
 }
