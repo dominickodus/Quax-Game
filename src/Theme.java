@@ -1,4 +1,6 @@
 public enum Theme {
-    Standard,
-    Colourful
+    Classic,
+    Alternate,
+    Jungle,
+    Desert
 }
