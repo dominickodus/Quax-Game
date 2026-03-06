@@ -69,6 +69,8 @@ public class BoardFx {
         HBox turnBox = new HBox(10);
         turnBox.setAlignment(Pos.CENTER);
         turnBox.setStyle("-fx-padding: 10;");
+        turnBox.setMinHeight(50);
+        turnBox.setPrefHeight(50);
 
         turnOctagon = createOctagon(12);
         turnRhombus = createRhombus(10, 10);
@@ -77,8 +79,8 @@ public class BoardFx {
         arrow.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
         turnText = new Label();
-
         turnText.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        turnText.setMinWidth(140);
 
         turnOctagon.setId("turnOctagon");
         turnRhombus.setId("turnRhombus");
@@ -86,6 +88,7 @@ public class BoardFx {
 
         turnBox.getChildren().addAll(turnOctagon, turnRhombus, arrow, turnText);
         root.setBottom(turnBox);
+        BorderPane.setAlignment(turnBox, Pos.CENTER);
 
         // BOARD GRID (VIS+1 because row 0 and col 0 are for labels)
         GridPane boardGrid = new GridPane();
@@ -197,6 +200,11 @@ public class BoardFx {
         Scene scene = new Scene(root, 900, 750);
         stage.setTitle("Quax Game (Player vs. Player)");
         stage.setScene(scene);
+
+        /* Prevent window becoming smaller than the board layout */
+        stage.setMinWidth(950);
+        stage.setMinHeight(800);
+
         stage.show();
     }
 
