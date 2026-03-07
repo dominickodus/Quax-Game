@@ -10,6 +10,7 @@ public class QuaxBoard {
 
      private boolean pieRuleEnabled; // Whether the pie rule is enable (To be implemented)
      private Turn turn;
+     private int turnsPassed;
 
      // Stores stones placed on the 11x11 grid of octagonal cells
      private final Colour[][] stones = new Colour[N][N];
@@ -64,6 +65,7 @@ public class QuaxBoard {
 
         stones[x][y] = currentPlayerColour();
         switchTurn();
+        turnsPassed ++;
         return true;
     }
 
