@@ -33,4 +33,22 @@ public class QuaxBoardTest {
         }
         assertEquals(Turn.Player1, board.getTurn());
     }
+
+    @Test
+    void test_Aux_turnCount(){
+        QuaxBoard board = new QuaxBoard(null);
+        assertEquals(0, board.getTurnsPassed());
+
+        board.switchTurn();
+        assertEquals(1, board.getTurnsPassed());
+    }
+
+    @Test
+    void test_Aux_turnCountConsistent(){
+        QuaxBoard board = new QuaxBoard(null);
+        for(int i = 0; i < 10 ; i++ ){
+            assertEquals(i, board.getTurnsPassed());
+            board.switchTurn();
+        }
+    }
 }

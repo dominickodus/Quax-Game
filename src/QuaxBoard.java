@@ -37,9 +37,13 @@ public class QuaxBoard {
 
     public Turn getTurn() { return turn; }
 
+    public int getTurnsPassed(){return turnsPassed;}
+
     // Switches to other players turn after a successful move.
     public void switchTurn() {
+
         turn = (turn == Turn.Player1) ? Turn.Player2 : Turn.Player1;
+        turnsPassed ++;
     }
 
     // Maps the current turn to a colour
@@ -65,7 +69,6 @@ public class QuaxBoard {
 
         stones[x][y] = currentPlayerColour();
         switchTurn();
-        turnsPassed ++;
         return true;
     }
 
