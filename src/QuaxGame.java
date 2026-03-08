@@ -13,7 +13,7 @@ public class QuaxGame {
         return board.placeStoneAt(x, y);
     }
 
-    // Places a rombus stone at (x,y)
+    // Places a rhombus stone at (x,y)
     public static boolean placeRhombus(QuaxBoard board, int x, int y) {
         return board.placeRhombusAt(x, y);
     }
@@ -24,8 +24,11 @@ public class QuaxGame {
     }
 
     // Placeholder for pie rule logic
-    public static boolean applyPieRule(QuaxBoard board) {
-        return false;
+    public static void applyPieRule(QuaxBoard board) {
+        board.setPieRuleEnabled();
+        board.switchTurn();
+        board.switchTurn(); //twice as after pie rule, turn should still be white
+        board.addTurnsPassed(-1);  // take away 1 from turn count as pie rule is only one turn
     }
 
 }

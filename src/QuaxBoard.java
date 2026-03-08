@@ -19,7 +19,7 @@ public class QuaxBoard {
      private final Colour[][] rhombi = new Colour[N-1][N-1];
 
     public QuaxBoard(Theme boardTheme) {
-        pieRuleEnabled = true;
+        pieRuleEnabled = false;
         turn = Turn.Player1;
 
         // init all board locations to empty
@@ -38,6 +38,11 @@ public class QuaxBoard {
     public Turn getTurn() { return turn; }
 
     public int getTurnsPassed(){return turnsPassed;}
+
+    public void addTurnsPassed(int x){
+        turnsPassed += x;
+    }
+
 
     // Switches to other players turn after a successful move.
     public void switchTurn() {
@@ -104,7 +109,10 @@ public class QuaxBoard {
     }
 
 
-    public void setPieRuleEnabled(boolean enabled) {
-
+    public void setPieRuleEnabled() {
+            this.pieRuleEnabled = true;
+    }
+    public boolean isPieRuleEnabled(){
+        return pieRuleEnabled;
     }
 }
