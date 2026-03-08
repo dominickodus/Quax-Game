@@ -1,0 +1,5 @@
+Our testing follows the following naming conventions to distinguish between the testing of features that are part of System Requirements, Custom/Added Features and Auxiliary Features.
+
+Testing of SR implementations: test_SRX_xyz()
+Testing of Added implementations: test_Custom_xyz()
+Testing of Auxiliary/Helper features: test_Aux_xyz()
