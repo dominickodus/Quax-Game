@@ -112,6 +112,7 @@ public class QuaxBoard {
     public void setPieRuleEnabled() {
             this.pieRuleEnabled = true;
     }
+
     public boolean isPieRuleEnabled(){
         return pieRuleEnabled;
     }

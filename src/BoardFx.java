@@ -1,5 +1,6 @@
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -36,6 +37,7 @@ public class BoardFx {
     private Polygon turnOctagon;
     private Polygon turnRhombus;
     private Label turnText;
+    private Button pieRuleButton;
 
     // store references so later you can render model properly
     private final StackPane[][] octagonNodes = new StackPane[N][N];
@@ -81,11 +83,30 @@ public class BoardFx {
         turnText.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         turnText.setMinWidth(140);
 
+        pieRuleButton = new Button("Activate Pie Rule");
+        pieRuleButton.setStyle(
+                "-fx-background-color: #c6d8ee;" +
+                        "-fx-background-radius: 8;" +
+                        "-fx-border-color: #6b8fb3;" +
+                        "-fx-border-radius: 8;" +
+                        "-fx-border-width: 1;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 4 10 4 10;"
+        );
+        pieRuleButton.setId("pieButton");
+        pieRuleButton.setVisible(false);
+        pieRuleButton.setManaged(false);
+        pieRuleButton.setOnAction(e ->{
+                activatePie(boardState);
+        });
+
+
         turnOctagon.setId("turnOctagon");
         turnRhombus.setId("turnRhombus");
         turnText.setId("turnText");
 
-        turnBox.getChildren().addAll(turnOctagon, turnRhombus, arrow, turnText);
+        turnBox.getChildren().addAll(turnOctagon, turnRhombus, arrow, turnText, pieRuleButton);
         root.setBottom(turnBox);
         BorderPane.setAlignment(turnBox, Pos.CENTER);
 
@@ -240,9 +261,17 @@ public class BoardFx {
         turnOctagon.setFill(c);
         turnRhombus.setFill(c);
         turnText.setText((blackToPlay ? "BLACK" : "WHITE") + " to play");
+        pieRuleButton.setVisible(boardState.getTurnsPassed() == 1);
+        pieRuleButton.setManaged(boardState.getTurnsPassed() == 1);
     }
 
         public BorderPane getRoot() {
             return root;
+        }
+
+        public void activatePie(QuaxBoard boardState){
+                QuaxGame.applyPieRule(boardState);
+                pieRuleButton.setVisible(false);
+                pieRuleButton.setManaged(false);
         }
  }
