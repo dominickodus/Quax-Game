@@ -38,6 +38,7 @@ public class BoardFx {
     private Polygon turnRhombus;
     private Label turnText;
     private Button pieRuleButton;
+    Label arrow;
 
     // store references so later you can render model properly
     private final StackPane[][] octagonNodes = new StackPane[N][N];
@@ -76,7 +77,7 @@ public class BoardFx {
         turnOctagon = createOctagon(12);
         turnRhombus = createRhombus(10, 10);
 
-        Label arrow = new Label("→");
+        arrow = new Label("→");
         arrow.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
         turnText = new Label();
@@ -258,11 +259,22 @@ public class BoardFx {
         boolean blackToPlay = (boardState.getTurn() == Turn.Player1); // based on your mapping below
         Color c = blackToPlay ? Color.BLACK : Color.WHITE;
 
-        turnOctagon.setFill(c);
-        turnRhombus.setFill(c);
-        turnText.setText((blackToPlay ? "BLACK" : "WHITE") + " to play");
-        pieRuleButton.setVisible(boardState.getTurnsPassed() == 1);
-        pieRuleButton.setManaged(boardState.getTurnsPassed() == 1);
+        if(!boardState.doesWinnerExist()) {
+            turnOctagon.setFill(c);
+            turnRhombus.setFill(c);
+            turnText.setText((blackToPlay ? "BLACK" : "WHITE") + " to play");
+            pieRuleButton.setVisible(boardState.getTurnsPassed() == 1);
+            pieRuleButton.setManaged(boardState.getTurnsPassed() == 1);
+        }
+        else{
+            turnOctagon.setVisible(false);
+            turnRhombus.setVisible(false);
+            arrow.setVisible(false);
+            turnOctagon.setManaged(false);
+            turnRhombus.setManaged(false);
+            arrow.setManaged(false);
+            turnText.setText((blackToPlay ? "WHITE" : "BlACK") + " wins");
+        }
     }
 
         public BorderPane getRoot() {

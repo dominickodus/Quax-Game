@@ -38,7 +38,13 @@ public class QuaxGame {
 
         boolean[] boardEdges = new boolean[2];  // if both these booleans are ture, that means both edges have been touched hence a valid chain is made
 
-        return depthFirstSearch(board, x,y,colour, visited, boardEdges); //recursive
+        boolean winnerExists = depthFirstSearch(board, x,y,colour, visited, boardEdges); //recursive
+
+        if (winnerExists){
+            board.setWinner();
+        }
+
+        return winnerExists;
     }
 
     // DOES NOT INCLUDE RHOMBI LOGIC YET
