@@ -273,7 +273,7 @@ public class BoardFx {
             turnOctagon.setManaged(false);
             turnRhombus.setManaged(false);
             arrow.setManaged(false);
-            turnText.setText((blackToPlay ? "WHITE" : "BlACK") + " wins");
+            turnText.setText((blackToPlay ? "WHITE" : "BLACK") + " wins");
         }
     }
 
