@@ -125,7 +125,18 @@ public class BoardFx {
 
             StackPane wrap = new StackPane(letterLabel);
             wrap.setMinSize(24, 35);
+            wrap.setStyle("-fx-border-width: 0 0 8 0; -fx-border-style: solid;");
+            GridPane.setMargin(wrap, new Insets(0, 0, 16, 0));
             boardGrid.add(wrap, 1 + 2 * x, 0); //Place labels at col 1, 3 ,5 etc
+        }
+
+        // Top border for cells without a letter label
+        for (int x = 0; x < N - 1; x++) {
+            StackPane wrap = new StackPane();
+            wrap.setMinSize(24, 35);
+            wrap.setStyle("-fx-border-width: 0 0 8 0; -fx-border-style: solid;");
+            GridPane.setMargin(wrap, new Insets(0, 0, 16, 0));
+            boardGrid.add(wrap, 2 + 2 * x, 0); //Place labels at col 2, 4 ,6 etc
         }
 
         // Left labels 1–11 aligned beside octagons
@@ -134,9 +145,20 @@ public class BoardFx {
             numLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
             StackPane wrap = new StackPane(numLabel);
-            wrap.setMinSize(35, 24);
+            wrap.setMinSize(45, 24);
+            wrap.setStyle("-fx-border-width: 0 8 0 0; -fx-border-style: solid; -fx-border-color: white;");
+            GridPane.setMargin(wrap, new Insets(0, 16, 0, 0));
 
             boardGrid.add(wrap, 0, 1 + 2 * y); // Place labels at col 1,3, 5
+        }
+
+        // Left border for cells without a number label
+        for (int y = 0; y < N - 1; y++) {
+            StackPane wrap = new StackPane();
+            wrap.setMinSize(45, 24);
+            wrap.setStyle("-fx-border-width: 0 8 0 0; -fx-border-style: solid; -fx-border-color: white;");
+            GridPane.setMargin(wrap, new Insets(0, 16, 0, 0));
+            boardGrid.add(wrap, 0, 2 + 2 * y); //Place labels at col 2, 4 ,6 etc
         }
 
         // Place octagons and rhombi in a 21x21 visual grid
