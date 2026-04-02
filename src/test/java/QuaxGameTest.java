@@ -1,6 +1,6 @@
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class QuaxGameTest {
     //Each Test is mapped to its related SR
@@ -94,4 +94,35 @@ public class QuaxGameTest {
 
         assertEquals(Turn.Player2, board.getTurn());
     }
+
+
+    //Testing Pie Rule Logic
+
+    @Test
+    void test_SR3_pieRuleEnabled(){
+        QuaxBoard board = new QuaxBoard(null);
+        assertFalse(board.isPieRuleEnabled());
+        QuaxGame.applyPieRule(board);
+        assertTrue(board.isPieRuleEnabled());
+    }
+
+    @Test
+    void test_SR3_whiteAfterPie(){
+        QuaxBoard board = new QuaxBoard(null);
+        board.switchTurn();
+        assertEquals(board.getTurn(), Turn.Player2);
+        QuaxGame.applyPieRule(board);
+        assertEquals(board.getTurn(), Turn.Player2);
+    }
+
+    @Test
+    void test_SR3_turnCountAfterPie(){
+        QuaxBoard board = new QuaxBoard(null);
+        board.switchTurn();
+        assertEquals(board.getTurnsPassed(), 1);
+        QuaxGame.applyPieRule(board);
+        assertEquals(board.getTurnsPassed(), 2);
+    }
+
+
 }

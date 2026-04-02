@@ -18,11 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class BoardFxTest extends ApplicationTest {
+    private QuaxBoard board;
 
     @Override
     public void start(Stage stage) {
         ThemeSet themeSet = new ThemeSet(Theme.Classic);
-        QuaxBoard board = new QuaxBoard(null);
+        board = new QuaxBoard(null);
         new BoardFx(stage, board, themeSet);
     }
 
@@ -93,4 +94,52 @@ public class BoardFxTest extends ApplicationTest {
 
         assertTrue(url.contains("JungleBackground.png"));
     }
+
+
+    //Pie Rule Button Tests
+    @Test
+    void test_SR3_PieButtonHiddenAtStart() {
+        Node pieButton = lookup("#pieButton").query();
+        assertFalse(pieButton.isVisible());
+    }
+
+    @Test
+    void test_SR3_PieButtonAppears() {
+        Polygon firstOct = lookup(".octagon").query();
+        clickOn(firstOct);
+        Node pieButton = lookup("#pieButton").query();
+        assertTrue(pieButton.isVisible());
+    }
+
+    @Test
+    void test_SR4_PieButtonDisappearsAfterMove() {
+
+        List<Polygon> octagons = lookup(".octagon").queryAll().stream().map(n -> (Polygon) n).toList();
+
+        clickOn(octagons.get(0));
+        clickOn(octagons.get(1));
+        Node pieButton = lookup("#pieButton").query();
+        assertFalse(pieButton.isVisible());
+    }
+
+    @Test
+    void test_PieButtonDisappearsAfterClick() {
+
+        Polygon firstOct = lookup(".octagon").query();
+        clickOn(firstOct);
+        Node pieButton = lookup("#pieButton").query();
+        assertTrue(pieButton.isVisible());
+        clickOn(pieButton);
+        assertFalse(pieButton.isVisible());
+    }
+
+    @Test
+    void test_PieRuleActivatesOnClick() {
+        Polygon firstOct = lookup(".octagon").query();
+        clickOn(firstOct);
+        assertFalse(board.isPieRuleEnabled());
+        clickOn("#pieButton");
+        assertTrue(board.isPieRuleEnabled());
+    }
+
 }

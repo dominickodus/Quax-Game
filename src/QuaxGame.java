@@ -10,22 +10,172 @@ public class QuaxGame {
 
     // Places an octagon stone at (x,y)
     public static boolean placeStone(QuaxBoard board, int x, int y) {
-        return board.placeStoneAt(x, y);
+
+        boolean ok = board.placeStoneAt(x, y);
+
+        boolean winningMove = false;
+
+        if (board.getTurnsPassed()  >= 11 && ok){
+            winningMove = checkWin(board, x , y);
+        }
+
+        if(winningMove){
+            System.out.println("winner"); //just for now for testing
+        }
+        return ok ;
     }
 
-    // Places a rombus stone at (x,y)
+    // Places a rhombus stone at (x,y)
     public static boolean placeRhombus(QuaxBoard board, int x, int y) {
-        return board.placeRhombusAt(x, y);
+
+        boolean ok = board.placeRhombusAt(x, y);
+        if (!ok) return false;
+
+        boolean winningMove = false;
+        Colour colour = board.getRhombus(x, y);
+
+        if (board.getTurnsPassed() >= 11) {
+
+            // Check both diagonals around this rhombus
+
+            // Diagonal 1: (x,y) ↔ (x+1,y+1)
+            if (board.getStone(x, y) == colour) {
+                winningMove = checkWin(board, x, y);
+            }
+
+            if (!winningMove && board.getStone(x + 1, y + 1) == colour) {
+                winningMove = checkWin(board, x + 1, y + 1);
+            }
+
+            // Diagonal 2: (x+1,y) ↔ (x,y+1)
+            if (!winningMove && board.getStone(x + 1, y) == colour) {
+                winningMove = checkWin(board, x + 1, y);
+            }
+
+            if (!winningMove && board.getStone(x, y + 1) == colour) {
+                winningMove = checkWin(board, x, y + 1);
+            }
+        }
+
+        if (winningMove) {
+            System.out.println("winner");
+        }
+
+        return true;
     }
 
-    // Placeholder for win detection
-    public static boolean checkWin(QuaxBoard board, Colour player) {
-        return false;
+
+    public static boolean checkWin(QuaxBoard board, int x, int y) {
+        Colour colour = board.getStone(x, y);
+
+        boolean[][] visited = new boolean[11][11]; //keeping track of what cells have been visited in the recursion
+
+        boolean[] boardEdges = new boolean[2];  // if both these booleans are ture, that means both edges have been touched hence a valid chain is made
+
+        boolean winnerExists = depthFirstSearch(board, x,y,colour, visited, boardEdges); //recursive
+
+        if (winnerExists){
+            board.setWinner();
+        }
+
+        return winnerExists;
+    }
+
+    // DOES NOT INCLUDE RHOMBI LOGIC YET
+    public static boolean depthFirstSearch(QuaxBoard board, int x, int y, Colour colour, boolean[][] visited, boolean[] boardEdges){
+
+        if(visited[x][y]) return false; //base case, cell already explored
+
+        visited[x][y] = true; //mark
+
+        // top to bottom edges
+        // 0, and 10 and the limits in our grid
+        if (colour == Colour.BLACK) {
+            if (y == 0) boardEdges[0] = true;        // top
+            if (y == 10) boardEdges[1] = true;    // bottom
+        }
+
+        //left to right
+        if (colour == Colour.WHITE) {
+            if (x == 0) boardEdges[0] = true;        // left
+            if (x == 10) boardEdges[1] = true;    // right
+        }
+
+        if(boardEdges[0] && boardEdges[1]) return true; // base (win) case, both edges touched
+
+        //now check all (octagon only currently) neighbours
+
+        // Right neighbour
+        if (board.inBoundsStone(x + 1, y) && board.getStone(x + 1, y) == colour) {
+            if (depthFirstSearch(board, x + 1, y, colour, visited, boardEdges))
+                return true;
+        }
+
+        // left neighbour
+        if (board.inBoundsStone(x - 1, y) && board.getStone(x - 1, y) == colour) {
+            if (depthFirstSearch(board, x - 1, y, colour, visited, boardEdges))
+                return true;
+        }
+
+        // up neighbour
+        if (board.inBoundsStone(x, y + 1) && board.getStone(x, y + 1) == colour) {
+            if (depthFirstSearch(board, x, y + 1, colour, visited, boardEdges))
+                return true;
+        }
+
+        // down neighbour
+        if (board.inBoundsStone(x, y - 1) && board.getStone(x, y - 1) == colour) {
+            if (depthFirstSearch(board, x, y - 1, colour, visited, boardEdges))
+                return true;
+        }
+
+        // ---- Diagonal neighbours through rhombi ----
+
+        // Down-right diagonal: (x,y) -> (x+1,y+1), using rhombus at (x,y)
+        if (board.inBoundsStone(x + 1, y + 1)
+                && board.getStone(x + 1, y + 1) == colour
+                && board.inBoundsRhombus(x, y)
+                && board.getRhombus(x, y) == colour) {
+            if (depthFirstSearch(board, x + 1, y + 1, colour, visited, boardEdges))
+                return true;
+        }
+
+        // Up-left diagonal: (x,y) -> (x-1,y-1), using rhombus at (x-1,y-1)
+        if (board.inBoundsStone(x - 1, y - 1)
+                && board.getStone(x - 1, y - 1) == colour
+                && board.inBoundsRhombus(x - 1, y - 1)
+                && board.getRhombus(x - 1, y - 1) == colour) {
+            if (depthFirstSearch(board, x - 1, y - 1, colour, visited, boardEdges))
+                return true;
+        }
+
+        // Up-right diagonal: (x,y) -> (x+1,y-1), using rhombus at (x, y-1)
+        if (board.inBoundsStone(x + 1, y - 1)
+                && board.getStone(x + 1, y - 1) == colour
+                && board.inBoundsRhombus(x, y - 1)
+                && board.getRhombus(x, y - 1) == colour) {
+            if (depthFirstSearch(board, x + 1, y - 1, colour, visited, boardEdges))
+                return true;
+        }
+
+        // Down-left diagonal: (x,y) -> (x-1,y+1), using rhombus at (x-1, y)
+        if (board.inBoundsStone(x - 1, y + 1)
+                && board.getStone(x - 1, y + 1) == colour
+                && board.inBoundsRhombus(x - 1, y)
+                && board.getRhombus(x - 1, y) == colour) {
+            if (depthFirstSearch(board, x - 1, y + 1, colour, visited, boardEdges))
+                return true;
+        }
+
+        return false; //return false if never found a win
     }
 
     // Placeholder for pie rule logic
-    public static boolean applyPieRule(QuaxBoard board) {
-        return false;
+    public static void applyPieRule(QuaxBoard board) {
+        board.setPieRuleEnabled();
+        board.switchTurn();
+        board.switchTurn(); //twice as after pie rule, turn should still be white
+        board.addTurnsPassed(-1);  // take away 1 from turn count as pie rule is only one turn
     }
 
 }

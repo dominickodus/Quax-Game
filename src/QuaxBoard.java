@@ -10,6 +10,8 @@ public class QuaxBoard {
 
      private boolean pieRuleEnabled; // Whether the pie rule is enable (To be implemented)
      private Turn turn;
+     private int turnsPassed;
+     private boolean winnerExists;
 
      // Stores stones placed on the 11x11 grid of octagonal cells
      private final Colour[][] stones = new Colour[N][N];
@@ -18,7 +20,8 @@ public class QuaxBoard {
      private final Colour[][] rhombi = new Colour[N-1][N-1];
 
     public QuaxBoard(Theme boardTheme) {
-        pieRuleEnabled = true;
+        pieRuleEnabled = false;
+        winnerExists = false;
         turn = Turn.Player1;
 
         // init all board locations to empty
@@ -32,13 +35,30 @@ public class QuaxBoard {
         }
     }
 
+    public boolean doesWinnerExist(){
+        return winnerExists;
+    }
+
+    public void setWinner(){
+        winnerExists = true;
+    }
+
 
 
     public Turn getTurn() { return turn; }
 
+    public int getTurnsPassed(){return turnsPassed;}
+
+    public void addTurnsPassed(int x){
+        turnsPassed += x;
+    }
+
+
     // Switches to other players turn after a successful move.
     public void switchTurn() {
+
         turn = (turn == Turn.Player1) ? Turn.Player2 : Turn.Player1;
+        turnsPassed ++;
     }
 
     // Maps the current turn to a colour
@@ -99,7 +119,11 @@ public class QuaxBoard {
     }
 
 
-    public void setPieRuleEnabled(boolean enabled) {
+    public void setPieRuleEnabled() {
+            this.pieRuleEnabled = true;
+    }
 
+    public boolean isPieRuleEnabled(){
+        return pieRuleEnabled;
     }
 }

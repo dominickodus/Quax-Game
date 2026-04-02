@@ -1,13 +1,13 @@
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
-
+import javafx.geometry.Insets;
 /**
  * JavaFX view for the Quax board.
  * BoardFx is responsible only for UI:
@@ -37,6 +37,8 @@ public class BoardFx {
     private Polygon turnOctagon;
     private Polygon turnRhombus;
     private Label turnText;
+    private Button pieRuleButton;
+    Label arrow;
 
     // store references so later you can render model properly
     private final StackPane[][] octagonNodes = new StackPane[N][N];
@@ -69,23 +71,45 @@ public class BoardFx {
         HBox turnBox = new HBox(10);
         turnBox.setAlignment(Pos.CENTER);
         turnBox.setStyle("-fx-padding: 10;");
+        turnBox.setMinHeight(50);
+        turnBox.setPrefHeight(50);
 
         turnOctagon = createOctagon(12);
         turnRhombus = createRhombus(10, 10);
 
-        Label arrow = new Label("→");
+        arrow = new Label("→");
         arrow.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
         turnText = new Label();
-
         turnText.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        turnText.setMinWidth(140);
+
+        pieRuleButton = new Button("Activate Pie Rule");
+        pieRuleButton.setStyle(
+                "-fx-background-color: #c6d8ee;" +
+                        "-fx-background-radius: 8;" +
+                        "-fx-border-color: #6b8fb3;" +
+                        "-fx-border-radius: 8;" +
+                        "-fx-border-width: 1;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 4 10 4 10;"
+        );
+        pieRuleButton.setId("pieButton");
+        pieRuleButton.setVisible(false);
+        pieRuleButton.setManaged(false);
+        pieRuleButton.setOnAction(e ->{
+                activatePie(boardState);
+        });
+
 
         turnOctagon.setId("turnOctagon");
         turnRhombus.setId("turnRhombus");
         turnText.setId("turnText");
 
-        turnBox.getChildren().addAll(turnOctagon, turnRhombus, arrow, turnText);
+        turnBox.getChildren().addAll(turnOctagon, turnRhombus, arrow, turnText, pieRuleButton);
         root.setBottom(turnBox);
+        BorderPane.setAlignment(turnBox, Pos.CENTER);
 
         // BOARD GRID (VIS+1 because row 0 and col 0 are for labels)
         GridPane boardGrid = new GridPane();
@@ -93,7 +117,6 @@ public class BoardFx {
         boardGrid.setHgap(0);
         boardGrid.setVgap(0);
         boardGrid.setGridLinesVisible(false); // turn on if debugging
-
 
         // Top labels A–K aligned over octagons
         for (int x = 0; x < N; x++) {
@@ -197,6 +220,11 @@ public class BoardFx {
         Scene scene = new Scene(root, 900, 750);
         stage.setTitle("Quax Game (Player vs. Player)");
         stage.setScene(scene);
+
+        /* Prevent window becoming smaller than the board layout */
+        stage.setMinWidth(950);
+        stage.setMinHeight(800);
+
         stage.show();
     }
 
@@ -231,12 +259,31 @@ public class BoardFx {
         boolean blackToPlay = (boardState.getTurn() == Turn.Player1); // based on your mapping below
         Color c = blackToPlay ? Color.BLACK : Color.WHITE;
 
-        turnOctagon.setFill(c);
-        turnRhombus.setFill(c);
-        turnText.setText((blackToPlay ? "BLACK" : "WHITE") + " to play");
+        if(!boardState.doesWinnerExist()) {
+            turnOctagon.setFill(c);
+            turnRhombus.setFill(c);
+            turnText.setText((blackToPlay ? "BLACK" : "WHITE") + " to play");
+            pieRuleButton.setVisible(boardState.getTurnsPassed() == 1);
+            pieRuleButton.setManaged(boardState.getTurnsPassed() == 1);
+        }
+        else{
+            turnOctagon.setVisible(false);
+            turnRhombus.setVisible(false);
+            arrow.setVisible(false);
+            turnOctagon.setManaged(false);
+            turnRhombus.setManaged(false);
+            arrow.setManaged(false);
+            turnText.setText((blackToPlay ? "WHITE" : "BLACK") + " wins");
+        }
     }
 
         public BorderPane getRoot() {
             return root;
+        }
+
+        public void activatePie(QuaxBoard boardState){
+                QuaxGame.applyPieRule(boardState);
+                pieRuleButton.setVisible(false);
+                pieRuleButton.setManaged(false);
         }
  }
