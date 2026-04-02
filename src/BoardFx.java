@@ -7,7 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
-
+import javafx.geometry.Insets;
 /**
  * JavaFX view for the Quax board.
  * BoardFx is responsible only for UI:

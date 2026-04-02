@@ -27,10 +27,44 @@ public class QuaxGame {
 
     // Places a rhombus stone at (x,y)
     public static boolean placeRhombus(QuaxBoard board, int x, int y) {
-        return board.placeRhombusAt(x, y);
+
+        boolean ok = board.placeRhombusAt(x, y);
+        if (!ok) return false;
+
+        boolean winningMove = false;
+        Colour colour = board.getRhombus(x, y);
+
+        if (board.getTurnsPassed() >= 11) {
+
+            // Check both diagonals around this rhombus
+
+            // Diagonal 1: (x,y) ↔ (x+1,y+1)
+            if (board.getStone(x, y) == colour) {
+                winningMove = checkWin(board, x, y);
+            }
+
+            if (!winningMove && board.getStone(x + 1, y + 1) == colour) {
+                winningMove = checkWin(board, x + 1, y + 1);
+            }
+
+            // Diagonal 2: (x+1,y) ↔ (x,y+1)
+            if (!winningMove && board.getStone(x + 1, y) == colour) {
+                winningMove = checkWin(board, x + 1, y);
+            }
+
+            if (!winningMove && board.getStone(x, y + 1) == colour) {
+                winningMove = checkWin(board, x, y + 1);
+            }
+        }
+
+        if (winningMove) {
+            System.out.println("winner");
+        }
+
+        return true;
     }
 
-    // DOES NOT INCLUDE RHOMBI LOGIC YET
+
     public static boolean checkWin(QuaxBoard board, int x, int y) {
         Colour colour = board.getStone(x, y);
 
@@ -92,6 +126,44 @@ public class QuaxGame {
         // down neighbour
         if (board.inBoundsStone(x, y - 1) && board.getStone(x, y - 1) == colour) {
             if (depthFirstSearch(board, x, y - 1, colour, visited, boardEdges))
+                return true;
+        }
+
+        // ---- Diagonal neighbours through rhombi ----
+
+        // Down-right diagonal: (x,y) -> (x+1,y+1), using rhombus at (x,y)
+        if (board.inBoundsStone(x + 1, y + 1)
+                && board.getStone(x + 1, y + 1) == colour
+                && board.inBoundsRhombus(x, y)
+                && board.getRhombus(x, y) == colour) {
+            if (depthFirstSearch(board, x + 1, y + 1, colour, visited, boardEdges))
+                return true;
+        }
+
+        // Up-left diagonal: (x,y) -> (x-1,y-1), using rhombus at (x-1,y-1)
+        if (board.inBoundsStone(x - 1, y - 1)
+                && board.getStone(x - 1, y - 1) == colour
+                && board.inBoundsRhombus(x - 1, y - 1)
+                && board.getRhombus(x - 1, y - 1) == colour) {
+            if (depthFirstSearch(board, x - 1, y - 1, colour, visited, boardEdges))
+                return true;
+        }
+
+        // Up-right diagonal: (x,y) -> (x+1,y-1), using rhombus at (x, y-1)
+        if (board.inBoundsStone(x + 1, y - 1)
+                && board.getStone(x + 1, y - 1) == colour
+                && board.inBoundsRhombus(x, y - 1)
+                && board.getRhombus(x, y - 1) == colour) {
+            if (depthFirstSearch(board, x + 1, y - 1, colour, visited, boardEdges))
+                return true;
+        }
+
+        // Down-left diagonal: (x,y) -> (x-1,y+1), using rhombus at (x-1, y)
+        if (board.inBoundsStone(x - 1, y + 1)
+                && board.getStone(x - 1, y + 1) == colour
+                && board.inBoundsRhombus(x - 1, y)
+                && board.getRhombus(x - 1, y) == colour) {
+            if (depthFirstSearch(board, x - 1, y + 1, colour, visited, boardEdges))
                 return true;
         }
 
