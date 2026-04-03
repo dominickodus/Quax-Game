@@ -124,5 +124,62 @@ public class QuaxGameTest {
         assertEquals(board.getTurnsPassed(), 2);
     }
 
+    @Test
+    void test_SR6_blackWin() {
+        QuaxBoard board = new QuaxBoard(null);
+        for (int i = 0; i < 11; i++) {
+            QuaxGame.placeStone(board, 0, i);
+            QuaxGame.placeStone(board, 1, i);
+        }
+        assert(board.doesWinnerExist());
+    }
 
+    @Test
+    void test_SR7_whiteWin() {
+        QuaxBoard board = new QuaxBoard(null);
+        for (int i = 0; i < 11; i++) {
+            QuaxGame.placeStone(board, i, 0);
+            QuaxGame.placeStone(board, i, 1);
+        }
+        assert(board.doesWinnerExist());
+    }
+
+    @Test
+    void test_SR6_falseWin() {
+        QuaxBoard board = new QuaxBoard(null);
+        board.placeStoneAt(0, 0);
+        assert(!board.doesWinnerExist());
+    }
+
+    @Test
+    void test_SR6_blackWinWithRhombus() {
+        QuaxBoard board = new QuaxBoard(null);
+        QuaxGame.placeStone(board, 0, 0); // Black
+        QuaxGame.placeStone(board, 10, 0); // White
+        QuaxGame.placeStone(board, 1, 1); // Black
+        QuaxGame.placeStone(board, 10, 1); // White
+        QuaxGame.placeRhombus(board, 0, 0); // Black Rhombus
+        QuaxGame.placeStone(board, 10, 2); // White
+        for (int i = 2; i < 11; i++) {
+            QuaxGame.placeStone(board, 1, i);
+            QuaxGame.placeStone(board, 9, i);
+        }
+        assert(board.doesWinnerExist());
+    }
+
+    @Test
+    void test_SR7_whiteWinWithRhombus() {
+        QuaxBoard board = new QuaxBoard(null);
+        QuaxGame.placeStone(board, 10, 0);
+        QuaxGame.placeStone(board, 0, 0); // White
+        QuaxGame.placeStone(board, 10, 1);
+        QuaxGame.placeStone(board, 1, 1); // White
+        QuaxGame.placeStone(board, 10, 2);
+        QuaxGame.placeRhombus(board, 0, 0); // White Rhombus
+        for (int i = 2; i < 11; i++) {
+            QuaxGame.placeStone(board, 9, i);
+            QuaxGame.placeStone(board, 1, i);
+        }
+        assert(board.doesWinnerExist());
+    }
 }

@@ -141,5 +141,4 @@ public class BoardFxTest extends ApplicationTest {
         clickOn("#pieButton");
         assertTrue(board.isPieRuleEnabled());
     }
-
 }
