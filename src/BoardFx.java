@@ -38,10 +38,18 @@ public class BoardFx {
     private Polygon turnRhombus;
     private Label turnText;
     private Button pieRuleButton;
+    private Button showStrategyButton;
+    private Button hideStrategyButton;
+    private Label strategyLabel;
+    private boolean showStrategy = false;
     Label arrow;
+
+    // Bot controller for Player2
+    private final BotController bot = new BotController();
 
     // store references so later you can render model properly
     private final StackPane[][] octagonNodes = new StackPane[N][N];
+    private final StackPane[][] rhombusNodes = new StackPane[N - 1][N - 1];
 
     // Helper for column label.
     private static String numToLetter(int i) {
@@ -57,7 +65,7 @@ public class BoardFx {
         root.setBackground(theme.getBackground());
 
         // TITLE
-        Label title = new Label("QUAX (Human V Human)");
+        Label title = new Label("QUAX (Human V Bot)");
 
         title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
         title.setTextFill(theme.getTextColour());
@@ -102,12 +110,57 @@ public class BoardFx {
                 activatePie(boardState);
         });
 
+        showStrategyButton = new Button("Show Strategy");
+        showStrategyButton.setId("showStrategyButton");
+
+        hideStrategyButton = new Button("Hide Strategy");
+        hideStrategyButton.setId("hideStrategyButton");
+        hideStrategyButton.setVisible(false);
+        hideStrategyButton.setManaged(false);
+
+        strategyLabel = new Label("No bot move yet.");
+        strategyLabel.setId("strategyLabel");
+        strategyLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+        strategyLabel.setWrapText(true);
+        strategyLabel.setMaxWidth(200);
+        strategyLabel.setVisible(false);
+        strategyLabel.setManaged(false);
+
+        showStrategyButton.setOnAction(e -> {
+            showStrategy = true;
+            strategyLabel.setVisible(true);
+            strategyLabel.setManaged(true);
+            showStrategyButton.setVisible(false);
+            showStrategyButton.setManaged(false);
+            hideStrategyButton.setVisible(true);
+            hideStrategyButton.setManaged(true);
+            updateStrategyDisplay();
+        });
+
+        hideStrategyButton.setOnAction(e -> {
+            showStrategy = false;
+            strategyLabel.setVisible(false);
+            strategyLabel.setManaged(false);
+            hideStrategyButton.setVisible(false);
+            hideStrategyButton.setManaged(false);
+            showStrategyButton.setVisible(true);
+            showStrategyButton.setManaged(true);
+        });
 
         turnOctagon.setId("turnOctagon");
         turnRhombus.setId("turnRhombus");
         turnText.setId("turnText");
 
-        turnBox.getChildren().addAll(turnOctagon, turnRhombus, arrow, turnText, pieRuleButton);
+        turnBox.getChildren().addAll(
+                turnOctagon,
+                turnRhombus,
+                arrow,
+                turnText,
+                pieRuleButton,
+                showStrategyButton,
+                hideStrategyButton,
+                strategyLabel
+        );
         root.setBottom(turnBox);
         BorderPane.setAlignment(turnBox, Pos.CENTER);
 
@@ -186,6 +239,9 @@ public class BoardFx {
 
                     // On click: forward octagonal placement request to QuaxGame, then update UI
                     cell.setOnMouseClicked(e -> {
+                        if (boardState.doesWinnerExist()) return;
+                        if (boardState.getTurn() == Turn.Player2) return;
+
                         boolean ok = QuaxGame.placeStone(boardState, bx, by);
                         if (!ok) return;
 
@@ -193,6 +249,14 @@ public class BoardFx {
                         oct.setFill(owner == Colour.BLACK ? Color.BLACK : Color.WHITE);
 
                         displayTurn(boardState);
+
+                        if (!boardState.doesWinnerExist()) {
+                            bot.makeMove(boardState);
+                            redrawBoard(boardState);
+                            highlightBotMove();
+                            displayTurn(boardState);
+                            updateStrategyDisplay();
+                        }
                     });
 
 
@@ -217,8 +281,13 @@ public class BoardFx {
                     final int rx = vx / 2;
                     final int ry = vy / 2;
 
+                    rhombusNodes[rx][ry] = cell;
+
                     // On click: forward rhombus placement request to QuaxGame, update UI
                     cell.setOnMouseClicked(e -> {
+                        if (boardState.doesWinnerExist()) return;
+                        if (boardState.getTurn() == Turn.Player2) return;
+                        
                         boolean ok = QuaxGame.placeRhombus(boardState, rx, ry);
                         if (!ok) return;
 
@@ -226,6 +295,14 @@ public class BoardFx {
                         rh.setFill(owner == Colour.BLACK ? Color.BLACK : Color.WHITE);
 
                         displayTurn(boardState);
+
+                        if (!boardState.doesWinnerExist()) {
+                            bot.makeMove(boardState);
+                            redrawBoard(boardState);
+                            highlightBotMove();
+                            displayTurn(boardState);
+                            updateStrategyDisplay();
+                        }
                     });
 
                     boardGrid.add(cell, col, row);
@@ -297,6 +374,83 @@ public class BoardFx {
             arrow.setManaged(false);
             turnText.setText((blackToPlay ? "WHITE" : "BLACK") + " wins");
         }
+    }
+
+    private void redrawBoard(QuaxBoard boardState) {
+        // Redraw stones
+        for (int x = 0; x < N; x++) {
+            for (int y = 0; y < N; y++) {
+
+                StackPane cell = octagonNodes[x][y];
+                Polygon oct = (Polygon) cell.getChildren().get(0);
+
+                Colour owner = boardState.getStone(x, y);
+
+                if (owner == Colour.BLACK) {
+                    oct.setFill(Color.BLACK);
+                } else if (owner == Colour.WHITE) {
+                    oct.setFill(Color.WHITE);
+                } else {
+                    oct.setFill(Color.rgb(0, 0, 0, 0.03));
+                }
+            }
+        }
+
+        // Redraw rhombi
+        for (int x = 0; x < N - 1; x++) {
+            for (int y = 0; y < N - 1; y++) {
+
+                StackPane cell = rhombusNodes[x][y];
+                if (cell == null) continue;
+
+                Polygon rh = (Polygon) cell.getChildren().get(0);
+                Colour owner = boardState.getRhombus(x, y);
+
+                if (owner == Colour.BLACK) {
+                    rh.setFill(Color.BLACK);
+                } else if (owner == Colour.WHITE) {
+                    rh.setFill(Color.WHITE);
+                } else {
+                    rh.setFill(Color.rgb(0, 0, 0, 0.08));
+                }
+            }
+        }
+    }
+
+    private void highlightBotMove() {
+        // Reset all octagon outlines first
+        for (int x = 0; x < N; x++) {
+            for (int y = 0; y < N; y++) {
+                StackPane cell = octagonNodes[x][y];
+                if (cell == null) continue;
+
+                Polygon oct = (Polygon) cell.getChildren().get(0);
+                oct.setStroke(Color.rgb(0, 0, 0, 0.55));
+                oct.setStrokeWidth(1.5);
+            }
+        }
+
+        Move lastMove = bot.getLastMove();
+        if (lastMove == null) return;
+
+        // For now, only highlight stone moves
+        if (lastMove.isRhombus()) return;
+
+        StackPane cell = octagonNodes[lastMove.getX()][lastMove.getY()];
+        if (cell == null) return;
+
+        Polygon oct = (Polygon) cell.getChildren().get(0);
+        oct.setStroke(Color.LIMEGREEN);
+        oct.setStrokeWidth(3);
+    }
+
+
+    private void updateStrategyDisplay() {
+        if (!showStrategy) return;
+
+        strategyLabel.setText(
+                bot.getLastStrategyUsed() + "\n" + bot.getLastExplanation()
+        );
     }
 
         public BorderPane getRoot() {

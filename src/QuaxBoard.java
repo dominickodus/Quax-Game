@@ -24,6 +24,7 @@ public class QuaxBoard {
         winnerExists = false;
         turn = Turn.Player1;
 
+
         // init all board locations to empty
         for (int x = 0; x < N; x++) {
             for (int y = 0; y < N; y++) stones[x][y] = Colour.NULL;
@@ -31,6 +32,25 @@ public class QuaxBoard {
         for (int x = 0; x < N-1; x++) {
             for (int y = 0; y < N-1; y++) {
                 rhombi[x][y] = Colour.NULL; //
+            }
+        }
+    }
+
+    public QuaxBoard(QuaxBoard other) {
+        this.pieRuleEnabled = other.pieRuleEnabled;
+        this.turn = other.turn;
+        this.turnsPassed = other.turnsPassed;
+        this.winnerExists = other.winnerExists;
+
+        for (int x = 0; x < N; x++) {
+            for (int y = 0; y < N; y++) {
+                this.stones[x][y] = other.getStone(x, y);
+            }
+        }
+
+        for (int x = 0; x < N - 1; x++) {
+            for (int y = 0; y < N - 1; y++) {
+                this.rhombi[x][y] = other.getRhombus(x, y);
             }
         }
     }
