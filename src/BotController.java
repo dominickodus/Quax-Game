@@ -10,6 +10,9 @@ public class BotController implements Controller {
     private String lastExplanation = "";
     private Move lastMove;
 
+    //Hard coded for now, change later;
+    private Turn botTurn = Turn.Player2;
+
     @Override
     public boolean isBot() {
         return true;
@@ -168,6 +171,21 @@ public class BotController implements Controller {
         return false;
     }
 
+    //helper that counts lines of stones instead of just neighbours
+    private int countContinuousStones(QuaxBoard board, int x, int y, int dx, int dy, Colour targetColour) {
+        int count = 0;
+        int nx = x + dx;
+        int ny = y + dy;
+
+        // Keep walking in the direction as long as we find the target colour
+        while (board.inBoundsStone(nx, ny) && board.getStone(nx, ny) == targetColour) {
+            count++;
+            nx += dx;
+            ny += dy;
+        }
+        return count;
+    }
+
     private boolean sameMove(Move a, Move b) {
         return a.getX() == b.getX()
                 && a.getY() == b.getY()
@@ -202,6 +220,28 @@ public class BotController implements Controller {
         // Most important: improve my path and worsen theirs
         score += 10000 * (myBefore - myAfter);
         score += 10000 * (oppAfter - oppBefore);
+
+
+
+        if (!move.isRhombus()) {
+            int maxContiguous = 0;
+
+
+            // Check Vertical threat
+            int vCount = countContinuousStones(board, move.getX(), move.getY(), 0, 1, opponent) + countContinuousStones(board, move.getX(), move.getY(), 0, -1, opponent);
+            // Check Horizontal threat
+            int hCount = countContinuousStones(board, move.getX(), move.getY(), 1, 0, opponent) + countContinuousStones(board, move.getX(), move.getY(), -1, 0, opponent);
+
+            if (botTurn == Turn.Player2) maxContiguous = vCount;
+            else maxContiguous = hCount;
+
+            if (maxContiguous >= 3) {
+                // breaks a potential line of >= 4
+                score += 50000;
+            }
+        }
+
+
 
         // Small tie-breakers
         if (!move.isRhombus()) {
