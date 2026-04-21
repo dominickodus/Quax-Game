@@ -10,8 +10,7 @@ public class BotController implements Controller {
     private String lastExplanation = "";
     private Move lastMove;
 
-    //Hard coded for now, change later;
-    private Turn botTurn = Turn.Player2;
+
 
     @Override
     public boolean isBot() {
@@ -171,7 +170,7 @@ public class BotController implements Controller {
         return false;
     }
 
-    //helper that counts lines of stones instead of just neighbours
+    //helper that counts continuous lines of stones instead of just neighbours
     private int countContinuousStones(QuaxBoard board, int x, int y, int dx, int dy, Colour targetColour) {
         int count = 0;
         int nx = x + dx;
@@ -232,8 +231,11 @@ public class BotController implements Controller {
             // Check Horizontal threat
             int hCount = countContinuousStones(board, move.getX(), move.getY(), 1, 0, opponent) + countContinuousStones(board, move.getX(), move.getY(), -1, 0, opponent);
 
-            if (botTurn == Turn.Player2) maxContiguous = vCount;
-            else maxContiguous = hCount;
+            if (opponent == Colour.BLACK) {
+                maxContiguous = vCount;
+            } else {
+                maxContiguous = hCount;
+            }
 
             if (maxContiguous >= 3) {
                 // breaks a potential line of >= 4

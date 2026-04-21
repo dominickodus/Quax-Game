@@ -1,5 +1,7 @@
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
@@ -7,7 +9,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
-import javafx.geometry.Insets;
 /**
  * JavaFX view for the Quax board.
  * BoardFx is responsible only for UI:
@@ -46,6 +47,7 @@ public class BoardFx {
 
     // Bot controller for Player2
     private final BotController bot = new BotController();
+    private Turn botTurn;
 
     // store references so later you can render model properly
     private final StackPane[][] octagonNodes = new StackPane[N][N];
@@ -59,6 +61,15 @@ public class BoardFx {
     public BoardFx(Stage stage, QuaxBoard boardState, ThemeSet theme) {
 
         this.theme = theme;
+
+
+        if (Math.random() < 0.5) {
+            botTurn = Turn.Player1;
+        } else {
+            botTurn = Turn.Player2;
+        }
+
+        showStartDialog(boardState);
 
         root = new BorderPane();
         root.setId("root");
@@ -240,7 +251,7 @@ public class BoardFx {
                     // On click: forward octagonal placement request to QuaxGame, then update UI
                     cell.setOnMouseClicked(e -> {
                         if (boardState.doesWinnerExist()) return;
-                        if (boardState.getTurn() == Turn.Player2) return;
+                        if (boardState.getTurn() == botTurn) return;
 
                         boolean ok = QuaxGame.placeStone(boardState, bx, by);
                         if (!ok) return;
@@ -250,7 +261,7 @@ public class BoardFx {
 
                         displayTurn(boardState);
 
-                        if (!boardState.doesWinnerExist()) {
+                        if (!boardState.doesWinnerExist()  && boardState.getTurn() == botTurn) {
                             bot.makeMove(boardState);
                             redrawBoard(boardState);
                             highlightBotMove();
@@ -286,7 +297,7 @@ public class BoardFx {
                     // On click: forward rhombus placement request to QuaxGame, update UI
                     cell.setOnMouseClicked(e -> {
                         if (boardState.doesWinnerExist()) return;
-                        if (boardState.getTurn() == Turn.Player2) return;
+                        if (boardState.getTurn() == botTurn) return;
                         
                         boolean ok = QuaxGame.placeRhombus(boardState, rx, ry);
                         if (!ok) return;
@@ -296,13 +307,14 @@ public class BoardFx {
 
                         displayTurn(boardState);
 
-                        if (!boardState.doesWinnerExist()) {
+                        if (!boardState.doesWinnerExist() && boardState.getTurn() == botTurn) {
                             bot.makeMove(boardState);
                             redrawBoard(boardState);
                             highlightBotMove();
                             displayTurn(boardState);
                             updateStrategyDisplay();
                         }
+
                     });
 
                     boardGrid.add(cell, col, row);
@@ -325,6 +337,16 @@ public class BoardFx {
         stage.setMinHeight(800);
 
         stage.show();
+
+        // If bot is Player1, make first move immediately
+        if (boardState.getTurn() == botTurn) {
+            bot.makeMove(boardState);
+            redrawBoard(boardState);
+            highlightBotMove();
+            displayTurn(boardState);
+            updateStrategyDisplay();
+        }
+
     }
 
 
@@ -355,7 +377,7 @@ public class BoardFx {
 
     // Update turn indicator based on current players turn
         public void displayTurn(QuaxBoard boardState) {
-        boolean blackToPlay = (boardState.getTurn() == Turn.Player1); // based on your mapping below
+        boolean blackToPlay = (boardState.getTurn() == Turn.Player1);
         Color c = blackToPlay ? Color.BLACK : Color.WHITE;
 
         if(!boardState.doesWinnerExist()) {
@@ -453,13 +475,48 @@ public class BoardFx {
         );
     }
 
+    private void showStartDialog(QuaxBoard boardState) {
+
+        String botColour = (botTurn == Turn.Player1) ? "BLACK" : "WHITE";
+        String playerColour = (botTurn == Turn.Player1) ? "WHITE" : "BLACK";
+
+        String firstPlayer = (boardState.getTurn() == botTurn) ? "BOT goes" : "YOU go";
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Game Start");
+        alert.setHeaderText("Game Setup");
+
+        alert.setContentText(
+                "You are: " + playerColour + "\n" +
+                        "Bot is: " + botColour + "\n\n" +
+                        firstPlayer + " first"
+        );
+
+        alert.showAndWait();
+    }
+
         public BorderPane getRoot() {
             return root;
         }
 
         public void activatePie(QuaxBoard boardState){
                 QuaxGame.applyPieRule(boardState);
+
+                if (botTurn == Turn.Player1) {
+                botTurn = Turn.Player2;
+                } else {
+                    botTurn = Turn.Player1;
+                }
+
                 pieRuleButton.setVisible(false);
                 pieRuleButton.setManaged(false);
+
+                while (boardState.getTurn() == botTurn && !boardState.doesWinnerExist()) {
+                    bot.makeMove(boardState);
+                    redrawBoard(boardState);
+                    highlightBotMove();
+                    displayTurn(boardState);
+                    updateStrategyDisplay();
+                }
         }
  }

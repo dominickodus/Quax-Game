@@ -22,7 +22,7 @@ public class QuaxBoard {
     public QuaxBoard(Theme boardTheme) {
         pieRuleEnabled = false;
         winnerExists = false;
-        turn = Turn.Player1;
+        turn = turn.Player1;
 
 
         // init all board locations to empty
