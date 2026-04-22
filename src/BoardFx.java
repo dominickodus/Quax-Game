@@ -300,7 +300,6 @@ public class BoardFx {
 
                         boolean ok = QuaxGame.placeStone(boardState, bx, by);
                         if (!ok) return;
-
                         Colour owner = boardState.getStone(bx, by);
                         oct.setFill(owner == Colour.BLACK ? Color.BLACK : Color.WHITE);
 
