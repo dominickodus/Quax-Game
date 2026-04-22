@@ -18,6 +18,30 @@ public class BotController implements Controller {
     }
 
     public Move chooseMove(QuaxBoard board) {
+
+        if (board.getTurnsPassed() == 0) {
+            List<Move> centralMoves = new ArrayList<>();
+
+            int[][] preferred = {
+                    {5,5}, {5,4}, {5,6}, {4,5}, {6,5}
+            };
+
+            for (int[] p : preferred) {
+                if (board.getStone(p[0], p[1]) == Colour.NULL) {
+                    centralMoves.add(new Move(p[0], p[1], false));
+                }
+            }
+
+            if (!centralMoves.isEmpty()) {
+                Move randomMove = centralMoves.get((int)(Math.random() * centralMoves.size()));
+
+                lastStrategyUsed = "Opening Strategy";
+                lastExplanation = "Bot selected a random central opening move.";
+                return randomMove;
+            }
+        }
+
+
         List<Move> validMoves = getAllValidMoves(board);
         if (validMoves.isEmpty()) return null;
 
