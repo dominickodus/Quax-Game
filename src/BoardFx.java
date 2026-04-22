@@ -74,7 +74,6 @@ public class BoardFx {
         this.theme = theme;
         this.onRestart = onRestart;
 
-
         if (Math.random() < 0.5) {
             botTurn = Turn.Player1;
         } else {
