@@ -241,7 +241,7 @@ public class BotController implements Controller {
 
             if (maxContiguous >= 3) {
                 // breaks a potential line of >= 4
-                score += 50000;
+                score += 720;
             }
         }
 
@@ -304,17 +304,26 @@ public class BotController implements Controller {
     }
 
     private int rhombusConnectionStrength(QuaxBoard board, int x, int y, Colour me) {
-        int bonus = 180;
+        int bonus = 0;
+        Colour opponent = (me == Colour.BLACK) ? Colour.WHITE : Colour.BLACK;
 
+        // Friendly diagonal: (x,y) <-> (x+1,y+1)
         if (board.inBoundsStone(x, y) && board.inBoundsStone(x + 1, y + 1)) {
             if (board.getStone(x, y) == me && board.getStone(x + 1, y + 1) == me) {
-                bonus += 320;
+                bonus += 600;
+            }
+            if (board.getStone(x, y) == opponent && board.getStone(x + 1, y + 1) == opponent) {
+                bonus += 500;
             }
         }
 
+        // Friendly diagonal: (x+1,y) <-> (x,y+1)
         if (board.inBoundsStone(x + 1, y) && board.inBoundsStone(x, y + 1)) {
             if (board.getStone(x + 1, y) == me && board.getStone(x, y + 1) == me) {
-                bonus += 320;
+                bonus += 600;
+            }
+            if (board.getStone(x + 1, y) == opponent && board.getStone(x, y + 1) == opponent) {
+                bonus += 500;
             }
         }
 
