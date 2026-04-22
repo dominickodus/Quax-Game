@@ -415,8 +415,8 @@ public class BoardFx {
         stage.setScene(scene);
 
         /* Prevent window becoming smaller than the board layout */
-        stage.setMinWidth(950);
-        stage.setMinHeight(800);
+        stage.setMinWidth(1000);
+        stage.setMinHeight(850);
 
         stage.show();
 
