@@ -29,6 +29,7 @@ public class BoardFx {
 
     private ThemeSet theme;
 
+    private boolean testingMode;
     private static final int N = 11;           // 11x11 octagon cells
     private static final int V = 2 * N - 1;  // 21x21 visual grid (octagons + rhombi)
 
@@ -69,18 +70,21 @@ public class BoardFx {
         return String.valueOf((char) ('A' + i));
     }
 
-    public BoardFx(Stage stage, QuaxBoard boardState, ThemeSet theme, Runnable onRestart) {
+    public BoardFx(Stage stage, QuaxBoard boardState, ThemeSet theme, Runnable onRestart, Turn forcedBotTurn, boolean testingMode) {
 
         this.theme = theme;
         this.onRestart = onRestart;
+        this.testingMode = testingMode;
 
-        if (Math.random() < 0.5) {
-            botTurn = Turn.Player1;
+        if (forcedBotTurn != null) {
+            botTurn = forcedBotTurn;
         } else {
-            botTurn = Turn.Player2;
+            botTurn = Math.random() < 0.5 ? Turn.Player1 : Turn.Player2;
         }
 
-        showStartDialog(boardState);
+        if (!testingMode) {
+            showStartDialog(boardState);
+        }
 
         root = new BorderPane();
         root.setId("root");
@@ -364,7 +368,7 @@ public class BoardFx {
                     cell.setOnMouseClicked(e -> {
                         if (boardState.doesWinnerExist()) return;
                         if (boardState.getTurn() == botTurn) return;
-                        
+
                         boolean ok = QuaxGame.placeRhombus(boardState, rx, ry);
                         if (!ok) return;
 
@@ -578,6 +582,7 @@ public class BoardFx {
     }
 
     private void botMoveWithDelay(QuaxBoard boardState) {
+        if (testingMode) return;
         if (boardState.getTurn() != botTurn || boardState.doesWinnerExist()) return;
 
         PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
@@ -732,11 +737,14 @@ public class BoardFx {
         QuaxGame.applyPieRule(boardState);
 
         // Show simple message
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Pie Rule Activated");
-        alert.setHeaderText("Pie Rule Used");
-        alert.setContentText("Sides have been swapped.");
-        alert.showAndWait();
+        if (!testingMode) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Pie Rule Activated");
+            alert.setHeaderText("Pie Rule Used");
+            alert.setContentText("Sides have been swapped.");
+            alert.showAndWait();
+        }
+
 
 
         if (botTurn == Turn.Player1) {
