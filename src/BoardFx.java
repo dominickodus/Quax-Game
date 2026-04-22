@@ -10,7 +10,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
-
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 import java.util.HashMap;
 
 /**
@@ -323,12 +324,7 @@ public class BoardFx {
                             }
 
                             redrawBoard(boardState);
-                            bot.makeMove(boardState);
-                            redrawBoard(boardState);
-                            highlightBotMove();
-                            displayTurn(boardState);
-                            updateStrategyDisplay();
-                            updateScores();
+                            botMoveWithDelay(boardState);
                         }
                     });
 
@@ -396,12 +392,7 @@ public class BoardFx {
                             }
 
                             redrawBoard(boardState);
-                            bot.makeMove(boardState);
-                            redrawBoard(boardState);
-                            highlightBotMove();
-                            displayTurn(boardState);
-                            updateStrategyDisplay();
-                            updateScores();
+                            botMoveWithDelay(boardState);
                         }
 
                     });
@@ -429,15 +420,8 @@ public class BoardFx {
 
         // If it is bot's turn at startup, let bot act
         if (boardState.getTurn() == botTurn) {
-
-
             redrawBoard(boardState);
-            bot.makeMove(boardState);
-            redrawBoard(boardState);
-            highlightBotMove();
-            displayTurn(boardState);
-            updateStrategyDisplay();
-            updateScores();
+            botMoveWithDelay(boardState);
         }
     }
 
@@ -595,6 +579,24 @@ public class BoardFx {
         }
     }
 
+    private void botMoveWithDelay(QuaxBoard boardState) {
+        if (boardState.getTurn() != botTurn || boardState.doesWinnerExist()) return;
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
+        pause.setOnFinished(e -> {
+            bot.makeMove(boardState);
+            redrawBoard(boardState);
+            highlightBotMove();
+            displayTurn(boardState);
+            updateStrategyDisplay();
+            updateScores();
+
+            // If bot still has turn (after pie rule etc), keep going
+            botMoveWithDelay(boardState);
+        });
+        pause.play();
+    }
+
     private void setScoreVisibility(boolean visible) {
         for (int x = 0; x < N; x++) {
             for (int y = 0; y < N; y++) {
@@ -748,14 +750,12 @@ public class BoardFx {
         pieRuleButton.setVisible(false);
         pieRuleButton.setManaged(false);
 
-        while (boardState.getTurn() == botTurn && !boardState.doesWinnerExist()) {
-            redrawBoard(boardState);
-            bot.makeMove(boardState);
-            redrawBoard(boardState);
-            highlightBotMove();
-            displayTurn(boardState);
-            updateStrategyDisplay();
-            updateScores();
-        }
+        redrawBoard(boardState);
+        displayTurn(boardState);
+        updateStrategyDisplay();
+        updateScores();
+        botMoveWithDelay(boardState);
     }
+
+
  }
