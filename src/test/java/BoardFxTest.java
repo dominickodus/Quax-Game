@@ -24,7 +24,7 @@ public class BoardFxTest extends ApplicationTest {
     public void start(Stage stage) {
         ThemeSet themeSet = new ThemeSet(Theme.Classic);
         board = new QuaxBoard(Theme.Classic);
-        new BoardFx(stage, board, themeSet);
+        new BoardFx(stage, board, themeSet, null);
     }
 
     /**
@@ -80,7 +80,7 @@ public class BoardFxTest extends ApplicationTest {
         interact(() -> {
             ThemeSet themeSet = new ThemeSet(Theme.Jungle);
             QuaxBoard board = new QuaxBoard(Theme.Classic);
-            new BoardFx((Stage) lookup("#root").query().getScene().getWindow(), board, themeSet);
+            new BoardFx((Stage) lookup("#root").query().getScene().getWindow(), board, themeSet, null);
         });
 
         BorderPane borderPane = lookup("#root").query();

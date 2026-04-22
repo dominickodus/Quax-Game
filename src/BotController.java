@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.HashMap;
 
 public class BotController implements Controller {
 
@@ -8,9 +9,8 @@ public class BotController implements Controller {
 
     private String lastStrategyUsed = "";
     private String lastExplanation = "";
+    private final HashMap<Move, Integer> moveScores = new HashMap<>();
     private Move lastMove;
-
-
 
     @Override
     public boolean isBot() {
@@ -23,9 +23,11 @@ public class BotController implements Controller {
 
         Move bestMove = null;
         int bestScore = Integer.MIN_VALUE;
+        moveScores.clear();
 
         for (Move move : validMoves) {
             int score = scoreMove(board, move);
+            moveScores.put(move, score);
             if (score > bestScore) {
                 bestScore = score;
                 bestMove = move;
@@ -426,6 +428,10 @@ public class BotController implements Controller {
 
     public Move getLastMove() {
         return lastMove;
+    }
+
+    public HashMap<Move, Integer> getLastScores() {
+        return moveScores;
     }
 
     private static class Node {

@@ -4,11 +4,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
+
+import java.util.HashMap;
+
 /**
  * JavaFX view for the Quax board.
  * BoardFx is responsible only for UI:
@@ -33,6 +37,12 @@ public class BoardFx {
     private static final double RHO_H = 21;    // rhombus half-height
 
     private BorderPane root;
+    private BorderPane winOverlay;
+
+    // Win overlay components
+    private Label winText;
+    private Button restartButton;
+    private Runnable onRestart;
 
     // Turn indicator UI components
     private Polygon turnOctagon;
@@ -58,9 +68,10 @@ public class BoardFx {
         return String.valueOf((char) ('A' + i));
     }
 
-    public BoardFx(Stage stage, QuaxBoard boardState, ThemeSet theme) {
+    public BoardFx(Stage stage, QuaxBoard boardState, ThemeSet theme, Runnable onRestart) {
 
         this.theme = theme;
+        this.onRestart = onRestart;
 
 
         if (Math.random() < 0.5) {
@@ -74,6 +85,33 @@ public class BoardFx {
         root = new BorderPane();
         root.setId("root");
         root.setBackground(theme.getBackground());
+
+        winOverlay = new BorderPane();
+        winOverlay.setBackground(new Background(
+                new BackgroundFill(Color.rgb(0, 0, 0, 0.7), null, null)
+        ));
+        winOverlay.setMouseTransparent(true);
+        winOverlay.setVisible(false);
+
+        winText = new Label();
+        winText.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+        winText.setTextFill(Color.WHITESMOKE);
+        winOverlay.setCenter(winText);
+
+        restartButton = new Button();
+        restartButton.setText("Restart");
+        restartButton.setOnAction(e -> {
+            System.out.println("restarting");
+            if (onRestart != null) onRestart.run();
+        });
+        restartButton.setDisable(true);
+
+        HBox bottomBox = new HBox(restartButton);
+        bottomBox.setAlignment(Pos.CENTER);
+        bottomBox.setPadding(new Insets(10));
+        winOverlay.setBottom(bottomBox);
+
+        StackPane rootPane = new StackPane(root, winOverlay);
 
         // TITLE
         Label title = new Label("QUAX (Human V Bot)");
@@ -146,6 +184,7 @@ public class BoardFx {
             hideStrategyButton.setVisible(true);
             hideStrategyButton.setManaged(true);
             updateStrategyDisplay();
+            setScoreVisibility(true);
         });
 
         hideStrategyButton.setOnAction(e -> {
@@ -156,6 +195,7 @@ public class BoardFx {
             hideStrategyButton.setManaged(false);
             showStrategyButton.setVisible(true);
             showStrategyButton.setManaged(true);
+            setScoreVisibility(false);
         });
 
         turnOctagon.setId("turnOctagon");
@@ -244,8 +284,13 @@ public class BoardFx {
 
                     Polygon oct = createOctagon(OCT_SIZE);
                     oct.getStyleClass().add("octagon");
-
-                    cell.getChildren().add(oct);
+                    Label scoreLabel = new Label();
+                    scoreLabel.setText("0");
+                    scoreLabel.setVisible(false);
+                    StackPane pane = new StackPane(oct, scoreLabel);
+                    pane.setPickOnBounds(false);
+                    scoreLabel.setMouseTransparent(true);
+                    cell.getChildren().add(pane);
 
 
                     // On click: forward octagonal placement request to QuaxGame, then update UI
@@ -262,11 +307,13 @@ public class BoardFx {
                         displayTurn(boardState);
 
                         if (!boardState.doesWinnerExist()  && boardState.getTurn() == botTurn) {
+                            redrawBoard(boardState);
                             bot.makeMove(boardState);
                             redrawBoard(boardState);
                             highlightBotMove();
                             displayTurn(boardState);
                             updateStrategyDisplay();
+                            updateScores();
                         }
                     });
 
@@ -285,6 +332,7 @@ public class BoardFx {
                     rh.setFill(Color.rgb(0, 0, 0, 0.08));
                     rh.setStroke(Color.rgb(0, 0, 0, 0.35));
                     rh.setStrokeWidth(1);
+                    rh.setStrokeType(StrokeType.INSIDE);
 
                     cell.getChildren().add(rh);
 
@@ -308,11 +356,13 @@ public class BoardFx {
                         displayTurn(boardState);
 
                         if (!boardState.doesWinnerExist() && boardState.getTurn() == botTurn) {
+                            redrawBoard(boardState);
                             bot.makeMove(boardState);
                             redrawBoard(boardState);
                             highlightBotMove();
                             displayTurn(boardState);
                             updateStrategyDisplay();
+                            updateScores();
                         }
 
                     });
@@ -328,7 +378,7 @@ public class BoardFx {
         // Initial display for Turn 1;
         displayTurn(boardState);
 
-        Scene scene = new Scene(root, 900, 750);
+        Scene scene = new Scene(rootPane, 900, 750);
         stage.setTitle("Quax Game (Player vs. Player)");
         stage.setScene(scene);
 
@@ -340,13 +390,14 @@ public class BoardFx {
 
         // If bot is Player1, make first move immediately
         if (boardState.getTurn() == botTurn) {
+            redrawBoard(boardState);
             bot.makeMove(boardState);
             redrawBoard(boardState);
             highlightBotMove();
             displayTurn(boardState);
             updateStrategyDisplay();
+            updateScores();
         }
-
     }
 
 
@@ -395,7 +446,18 @@ public class BoardFx {
             turnRhombus.setManaged(false);
             arrow.setManaged(false);
             turnText.setText((blackToPlay ? "WHITE" : "BLACK") + " wins");
+            enableWinOverlay(blackToPlay ? "WHITE" : "BLACK");
         }
+    }
+
+    private void enableWinOverlay(String winner) {
+        GaussianBlur blur = new GaussianBlur(10);
+        root.setEffect(blur);
+        winText.setText(winner + " wins!");
+        restartButton.setDisable(false);
+        winOverlay.setVisible(true);
+        winOverlay.setMouseTransparent(false);
+        System.out.println(restartButton.isDisable());
     }
 
     private void redrawBoard(QuaxBoard boardState) {
@@ -404,7 +466,8 @@ public class BoardFx {
             for (int y = 0; y < N; y++) {
 
                 StackPane cell = octagonNodes[x][y];
-                Polygon oct = (Polygon) cell.getChildren().get(0);
+                StackPane pane = (StackPane) cell.getChildren().get(0);
+                Polygon oct = (Polygon) pane.getChildren().get(0);
 
                 Colour owner = boardState.getStone(x, y);
 
@@ -446,26 +509,96 @@ public class BoardFx {
                 StackPane cell = octagonNodes[x][y];
                 if (cell == null) continue;
 
-                Polygon oct = (Polygon) cell.getChildren().get(0);
+                StackPane pane = (StackPane) cell.getChildren().get(0);
+                Polygon oct = (Polygon) pane.getChildren().get(0);
                 oct.setStroke(Color.rgb(0, 0, 0, 0.55));
                 oct.setStrokeWidth(1.5);
+            }
+        }
+
+        // Reset all rhombus outlines
+        for (int x = 0; x < N - 1; x++) {
+            for (int y = 0; y < N - 1; y++) {
+                StackPane cell = rhombusNodes[x][y];
+                if (cell == null) continue;
+
+                Polygon rhombus = (Polygon) cell.getChildren().get(0);
+                rhombus.setStroke(Color.rgb(0, 0, 0, 0.35));
+                rhombus.setStrokeWidth(1);
             }
         }
 
         Move lastMove = bot.getLastMove();
         if (lastMove == null) return;
 
-        // For now, only highlight stone moves
-        if (lastMove.isRhombus()) return;
 
-        StackPane cell = octagonNodes[lastMove.getX()][lastMove.getY()];
-        if (cell == null) return;
+        if (lastMove.isRhombus()) {
+            StackPane cell = rhombusNodes[lastMove.getX()][lastMove.getY()];
+            if (cell == null) return;
 
-        Polygon oct = (Polygon) cell.getChildren().get(0);
-        oct.setStroke(Color.LIMEGREEN);
-        oct.setStrokeWidth(3);
+            Polygon rhombus = (Polygon) cell.getChildren().get(0);
+            rhombus.setStroke(Color.LIMEGREEN);
+            rhombus.setStrokeWidth(3);
+        } else {
+            StackPane cell = octagonNodes[lastMove.getX()][lastMove.getY()];
+            if (cell == null) return;
+
+            StackPane pane =  (StackPane) cell.getChildren().get(0);
+            Polygon oct = (Polygon) pane.getChildren().get(0);
+            oct.setStroke(Color.LIMEGREEN);
+            oct.setStrokeWidth(3);
+        }
     }
 
+    private void setScoreVisibility(boolean visible) {
+        for (int x = 0; x < N; x++) {
+            for (int y = 0; y < N; y++) {
+                StackPane cell = octagonNodes[x][y];
+                if (cell == null) continue;
+
+                StackPane pane = (StackPane) cell.getChildren().get(0);
+                Label label = (Label) pane.getChildren().get(1);
+                label.setVisible(visible);
+            }
+        }
+    }
+
+    private void updateScores() {
+        // Reset all octagon text first
+        for (int x = 0; x < N; x++) {
+            for (int y = 0; y < N; y++) {
+                StackPane cell = octagonNodes[x][y];
+                if (cell == null) continue;
+
+                StackPane pane = (StackPane) cell.getChildren().get(0);
+                Label label = (Label) pane.getChildren().get(1);
+                label.setText("");
+                label.setTextFill(Color.rgb(0, 0, 0));
+            }
+        }
+
+        // Update score text
+        HashMap<Move, Integer> scores = bot.getLastScores();
+        for (Move move : scores.keySet()) {
+            if (move.isRhombus()) continue;
+            StackPane cell = octagonNodes[move.getX()][move.getY()];
+            if (cell == null) continue;
+
+            StackPane pane = (StackPane) cell.getChildren().get(0);
+            Label label = (Label) pane.getChildren().get(1);
+            label.setText(scores.get(move).toString());
+        }
+
+        // Make the winning move's score green
+        Move move = bot.getLastMove();
+        if (move.isRhombus()) return;
+        StackPane cell = octagonNodes[move.getX()][move.getY()];
+        if (cell == null) return;
+
+        StackPane pane = (StackPane) cell.getChildren().get(0);
+        Label label = (Label) pane.getChildren().get(1);
+        label.setTextFill(Color.LIMEGREEN);
+    }
 
     private void updateStrategyDisplay() {
         if (!showStrategy) return;
@@ -512,11 +645,13 @@ public class BoardFx {
                 pieRuleButton.setManaged(false);
 
                 while (boardState.getTurn() == botTurn && !boardState.doesWinnerExist()) {
+                    redrawBoard(boardState);
                     bot.makeMove(boardState);
                     redrawBoard(boardState);
                     highlightBotMove();
                     displayTurn(boardState);
                     updateStrategyDisplay();
+                    updateScores();
                 }
         }
  }

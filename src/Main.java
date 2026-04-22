@@ -3,10 +3,15 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    Stage stage;
+
     @Override
-
     public void start(Stage stage) {
+        this.stage = stage;
+        launchGame();
+    }
 
+    private void launchGame() {
         Theme selectedTheme = ThemeSelector.promptThemeSelection(stage);
         if (selectedTheme == null) {
             System.exit(0);
@@ -14,7 +19,10 @@ public class Main extends Application {
         ThemeSet themeSet = new ThemeSet(selectedTheme);
         QuaxBoard boardState = new QuaxBoard(selectedTheme);
 
-        new BoardFx(stage, boardState, themeSet);
+        BoardFx board = new BoardFx(stage, boardState, themeSet, () -> {
+            stage.setScene(null);
+            launchGame();
+        });
     }
 
     public static void main(String[] args) {
