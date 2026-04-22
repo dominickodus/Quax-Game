@@ -334,7 +334,16 @@ public class BoardFx {
                     rh.setStrokeWidth(1);
                     rh.setStrokeType(StrokeType.INSIDE);
 
-                    cell.getChildren().add(rh);
+                    Label scoreLabel = new Label();
+                    scoreLabel.setText("");
+                    scoreLabel.setVisible(false);
+                    scoreLabel.setStyle("-fx-font-size: 9px; -fx-font-weight: bold;");
+
+                    StackPane pane = new StackPane(rh, scoreLabel);
+                    pane.setPickOnBounds(false);
+                    scoreLabel.setMouseTransparent(true);
+
+                    cell.getChildren().add(pane);
 
                     // Convert visual coordinates to rhombus grid coordinates
                     final int rx = vx / 2;
@@ -488,7 +497,9 @@ public class BoardFx {
                 StackPane cell = rhombusNodes[x][y];
                 if (cell == null) continue;
 
-                Polygon rh = (Polygon) cell.getChildren().get(0);
+                StackPane pane = (StackPane) cell.getChildren().get(0);
+                Polygon rh = (Polygon) pane.getChildren().get(0);
+
                 Colour owner = boardState.getRhombus(x, y);
 
                 if (owner == Colour.BLACK) {
@@ -522,7 +533,8 @@ public class BoardFx {
                 StackPane cell = rhombusNodes[x][y];
                 if (cell == null) continue;
 
-                Polygon rhombus = (Polygon) cell.getChildren().get(0);
+                StackPane pane = (StackPane) cell.getChildren().get(0);
+                Polygon rhombus = (Polygon) pane.getChildren().get(0);
                 rhombus.setStroke(Color.rgb(0, 0, 0, 0.35));
                 rhombus.setStrokeWidth(1);
             }
@@ -536,7 +548,8 @@ public class BoardFx {
             StackPane cell = rhombusNodes[lastMove.getX()][lastMove.getY()];
             if (cell == null) return;
 
-            Polygon rhombus = (Polygon) cell.getChildren().get(0);
+            StackPane pane = (StackPane) cell.getChildren().get(0);
+            Polygon rhombus = (Polygon) pane.getChildren().get(0);
             rhombus.setStroke(Color.LIMEGREEN);
             rhombus.setStrokeWidth(3);
         } else {
@@ -561,6 +574,16 @@ public class BoardFx {
                 label.setVisible(visible);
             }
         }
+        for (int x = 0; x < N - 1; x++) {
+            for (int y = 0; y < N - 1; y++) {
+                StackPane cell = rhombusNodes[x][y];
+                if (cell == null) continue;
+
+                StackPane pane = (StackPane) cell.getChildren().get(0);
+                Label label = (Label) pane.getChildren().get(1);
+                label.setVisible(visible);
+            }
+        }
     }
 
     private void updateScores() {
@@ -577,27 +600,67 @@ public class BoardFx {
             }
         }
 
+        // Reset all rhombus text
+        for (int x = 0; x < N - 1; x++) {
+            for (int y = 0; y < N - 1; y++) {
+                StackPane cell = rhombusNodes[x][y];
+                if (cell == null) continue;
+
+                StackPane pane = (StackPane) cell.getChildren().get(0);
+                Label label = (Label) pane.getChildren().get(1);
+                label.setText("");
+                label.setTextFill(Color.rgb(0, 0, 0));
+            }
+        }
+
         // Update score text
         HashMap<Move, Integer> scores = bot.getLastScores();
         for (Move move : scores.keySet()) {
-            if (move.isRhombus()) continue;
-            StackPane cell = octagonNodes[move.getX()][move.getY()];
-            if (cell == null) continue;
+            int score = scores.get(move);
+
+            if (move.isRhombus()) {
+                StackPane cell = rhombusNodes[move.getX()][move.getY()];
+                if (cell == null) continue;
+
+                StackPane pane = (StackPane) cell.getChildren().get(0);
+                Label label = (Label) pane.getChildren().get(1);
+
+                // Only show strong rhombus scores
+                if (score >= 200) {
+                    label.setText(String.valueOf(score));
+                } else {
+                    label.setText("");
+                }
+
+            } else {
+                StackPane cell = octagonNodes[move.getX()][move.getY()];
+                if (cell == null) continue;
+
+                StackPane pane = (StackPane) cell.getChildren().get(0);
+                Label label = (Label) pane.getChildren().get(1);
+                label.setText(String.valueOf(score));
+            }
+        }
+
+        // Make the chosen move's score green
+        Move move = bot.getLastMove();
+        if (move == null) return;
+
+        if (move.isRhombus()) {
+            StackPane cell = rhombusNodes[move.getX()][move.getY()];
+            if (cell == null) return;
 
             StackPane pane = (StackPane) cell.getChildren().get(0);
             Label label = (Label) pane.getChildren().get(1);
-            label.setText(scores.get(move).toString());
+            label.setTextFill(Color.LIMEGREEN);
+        } else {
+            StackPane cell = octagonNodes[move.getX()][move.getY()];
+            if (cell == null) return;
+
+            StackPane pane = (StackPane) cell.getChildren().get(0);
+            Label label = (Label) pane.getChildren().get(1);
+            label.setTextFill(Color.LIMEGREEN);
         }
-
-        // Make the winning move's score green
-        Move move = bot.getLastMove();
-        if (move.isRhombus()) return;
-        StackPane cell = octagonNodes[move.getX()][move.getY()];
-        if (cell == null) return;
-
-        StackPane pane = (StackPane) cell.getChildren().get(0);
-        Label label = (Label) pane.getChildren().get(1);
-        label.setTextFill(Color.LIMEGREEN);
     }
 
     private void updateStrategyDisplay() {
