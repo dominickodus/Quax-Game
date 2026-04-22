@@ -58,9 +58,116 @@ public class BotController implements Controller {
             }
         }
 
-        lastStrategyUsed = "Pathfinding Strategy";
-        lastExplanation = "Bot simulated every legal move and chose the one that most improved its path while making the opponent's path harder.";
+        setMoveExplanation(board, bestMove);
         return bestMove;
+    }
+
+    private void setMoveExplanation(QuaxBoard board, Move move) {
+        if (move == null) {
+            lastStrategyUsed = "No Move";
+            lastExplanation = "Bot found no legal move.";
+            return;
+        }
+
+        Colour me = board.currentPlayerColour();
+        Colour opponent = (me == Colour.BLACK) ? Colour.WHITE : Colour.BLACK;
+
+        if (isWinningMove(board, move)) {
+            lastStrategyUsed = "Winning Strategy";
+            lastExplanation = "Bot chose this move because it wins immediately.";
+            return;
+        }
+
+        if (blocksOpponentImmediateWin(board, move)) {
+            lastStrategyUsed = "Blocking Strategy";
+            lastExplanation = "Bot chose this move because it blocks the opponent's immediate winning move.";
+            return;
+        }
+
+        if (move.isRhombus()) {
+            int x = move.getX();
+            int y = move.getY();
+
+            boolean connectsMine = false;
+            boolean blocksOpponent = false;
+
+            // diagonal 1
+            if (board.inBoundsStone(x, y) && board.inBoundsStone(x + 1, y + 1)) {
+                if (board.getStone(x, y) == me && board.getStone(x + 1, y + 1) == me) {
+                    connectsMine = true;
+                }
+                if (board.getStone(x, y) == opponent && board.getStone(x + 1, y + 1) == opponent) {
+                    blocksOpponent = true;
+                }
+            }
+
+            // diagonal 2
+            if (board.inBoundsStone(x + 1, y) && board.inBoundsStone(x, y + 1)) {
+                if (board.getStone(x + 1, y) == me && board.getStone(x, y + 1) == me) {
+                    connectsMine = true;
+                }
+                if (board.getStone(x + 1, y) == opponent && board.getStone(x, y + 1) == opponent) {
+                    blocksOpponent = true;
+                }
+            }
+
+            if (connectsMine && blocksOpponent) {
+                lastStrategyUsed = "Rhombus Dual Strategy";
+                lastExplanation = "Bot chose this rhombus because it strengthens its own diagonal while also interfering with the opponent.";
+            } else if (connectsMine) {
+                lastStrategyUsed = "Rhombus Connection Strategy";
+                lastExplanation = "Bot chose this rhombus because it strongly connects its diagonal stones.";
+            } else if (blocksOpponent) {
+                lastStrategyUsed = "Rhombus Blocking Strategy";
+                lastExplanation = "Bot chose this rhombus because it interferes with the opponent's diagonal connection.";
+            } else {
+                lastStrategyUsed = "Rhombus Strategy";
+                lastExplanation = "Bot chose this rhombus because it improves board connectivity.";
+            }
+            return;
+        }
+
+        int friendlyNeighbours = countFriendlyNeighbours(board, move.getX(), move.getY(), me);
+        int opponentNeighbours = countFriendlyNeighbours(board, move.getX(), move.getY(), opponent);
+
+        int maxContiguous = 0;
+        int vCount = countContinuousStones(board, move.getX(), move.getY(), 0, 1, opponent)
+                + countContinuousStones(board, move.getX(), move.getY(), 0, -1, opponent);
+        int hCount = countContinuousStones(board, move.getX(), move.getY(), 1, 0, opponent)
+                + countContinuousStones(board, move.getX(), move.getY(), -1, 0, opponent);
+
+        if (opponent == Colour.BLACK) {
+            maxContiguous = vCount;
+        } else {
+            maxContiguous = hCount;
+        }
+
+        if (maxContiguous >= 3) {
+            lastStrategyUsed = "Defensive Strategy";
+            lastExplanation = "Bot chose this move to break a strong opponent line.";
+            return;
+        }
+
+        if (createsRhombusOpportunity(board, move.getX(), move.getY(), me)) {
+            lastStrategyUsed = "Setup Strategy";
+            lastExplanation = "Bot chose this move to create a future rhombus opportunity.";
+            return;
+        }
+
+        if (friendlyNeighbours >= 2) {
+            lastStrategyUsed = "Connection Strategy";
+            lastExplanation = "Bot chose this move to strengthen its existing chain of stones.";
+            return;
+        }
+
+        if (opponentNeighbours >= 2) {
+            lastStrategyUsed = "Pressure Strategy";
+            lastExplanation = "Bot chose this move to apply pressure near the opponent's stones.";
+            return;
+        }
+
+        lastStrategyUsed = "Pathfinding Strategy";
+        lastExplanation = "Bot chose the move that best improved its path across the board.";
     }
 
     public boolean makeMove(QuaxBoard board) {
