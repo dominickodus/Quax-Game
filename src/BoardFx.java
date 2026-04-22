@@ -379,7 +379,7 @@ public class BoardFx {
 
                             // Bot may choose pie rule immediately after the first move
                             if (boardState.getTurnsPassed() == 1) {
-                                boolean usePieRule = Math.random() < 1.0; // use 1.0 while testing
+                                boolean usePieRule = Math.random() < .5; // use 1.0 while testing
 
                                 if (usePieRule) {
                                     activatePie(boardState);
