@@ -132,8 +132,8 @@ public class BoardFx {
         HBox turnBox = new HBox(10);
         turnBox.setAlignment(Pos.CENTER);
         turnBox.setStyle("-fx-padding: 10;");
-        turnBox.setMinHeight(50);
-        turnBox.setPrefHeight(50);
+        turnBox.setMinHeight(90);
+        turnBox.setPrefHeight(90);
 
         turnOctagon = createOctagon(12);
         turnRhombus = createRhombus(10, 10);
@@ -175,7 +175,7 @@ public class BoardFx {
         strategyLabel.setId("strategyLabel");
         strategyLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
         strategyLabel.setWrapText(true);
-        strategyLabel.setMaxWidth(200);
+        strategyLabel.setMaxWidth(350);
         strategyLabel.setVisible(false);
         strategyLabel.setManaged(false);
 
@@ -594,7 +594,7 @@ public class BoardFx {
             updateStrategyDisplay();
             updateScores();
 
-            // If bot still has turn (after pie rule etc), keep going
+            // If bot still has turn (after pie rule etc.), keep going
             botMoveWithDelay(boardState);
         });
         pause.play();
