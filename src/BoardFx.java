@@ -727,26 +727,35 @@ public class BoardFx {
             return root;
         }
 
-        public void activatePie(QuaxBoard boardState){
-                QuaxGame.applyPieRule(boardState);
+    public void activatePie(QuaxBoard boardState){
 
-                if (botTurn == Turn.Player1) {
-                botTurn = Turn.Player2;
-                } else {
-                    botTurn = Turn.Player1;
-                }
+        QuaxGame.applyPieRule(boardState);
 
-                pieRuleButton.setVisible(false);
-                pieRuleButton.setManaged(false);
+        // Show simple message
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Pie Rule Activated");
+        alert.setHeaderText("Pie Rule Used");
+        alert.setContentText("Sides have been swapped.");
+        alert.showAndWait();
 
-                while (boardState.getTurn() == botTurn && !boardState.doesWinnerExist()) {
-                    redrawBoard(boardState);
-                    bot.makeMove(boardState);
-                    redrawBoard(boardState);
-                    highlightBotMove();
-                    displayTurn(boardState);
-                    updateStrategyDisplay();
-                    updateScores();
-                }
+
+        if (botTurn == Turn.Player1) {
+            botTurn = Turn.Player2;
+        } else {
+            botTurn = Turn.Player1;
         }
+
+        pieRuleButton.setVisible(false);
+        pieRuleButton.setManaged(false);
+
+        while (boardState.getTurn() == botTurn && !boardState.doesWinnerExist()) {
+            redrawBoard(boardState);
+            bot.makeMove(boardState);
+            redrawBoard(boardState);
+            highlightBotMove();
+            displayTurn(boardState);
+            updateStrategyDisplay();
+            updateScores();
+        }
+    }
  }
