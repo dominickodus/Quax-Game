@@ -306,7 +306,22 @@ public class BoardFx {
 
                         displayTurn(boardState);
 
-                        if (!boardState.doesWinnerExist()  && boardState.getTurn() == botTurn) {
+                        if (!boardState.doesWinnerExist() && boardState.getTurn() == botTurn) {
+
+                            // Bot may choose pie rule immediately after the first move
+                            if (boardState.getTurnsPassed() == 1) {
+                                boolean usePieRule = Math.random() < .5;
+
+                                if (usePieRule) {
+                                    activatePie(boardState);
+                                    redrawBoard(boardState);
+                                    displayTurn(boardState);
+                                    updateStrategyDisplay();
+                                    updateScores();
+                                    return;
+                                }
+                            }
+
                             redrawBoard(boardState);
                             bot.makeMove(boardState);
                             redrawBoard(boardState);
@@ -365,6 +380,21 @@ public class BoardFx {
                         displayTurn(boardState);
 
                         if (!boardState.doesWinnerExist() && boardState.getTurn() == botTurn) {
+
+                            // Bot may choose pie rule immediately after the first move
+                            if (boardState.getTurnsPassed() == 1) {
+                                boolean usePieRule = Math.random() < 1.0; // use 1.0 while testing
+
+                                if (usePieRule) {
+                                    activatePie(boardState);
+                                    redrawBoard(boardState);
+                                    displayTurn(boardState);
+                                    updateStrategyDisplay();
+                                    updateScores();
+                                    return;
+                                }
+                            }
+
                             redrawBoard(boardState);
                             bot.makeMove(boardState);
                             redrawBoard(boardState);
@@ -397,8 +427,10 @@ public class BoardFx {
 
         stage.show();
 
-        // If bot is Player1, make first move immediately
+        // If it is bot's turn at startup, let bot act
         if (boardState.getTurn() == botTurn) {
+
+
             redrawBoard(boardState);
             bot.makeMove(boardState);
             redrawBoard(boardState);
