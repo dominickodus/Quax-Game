@@ -13,15 +13,19 @@ public class QuaxGame {
 
         boolean ok = board.placeStoneAt(x, y);
 
-        boolean winningMove = false;
+        //boolean winningMove = false;
 
         if (board.getTurnsPassed()  >= 11 && ok){
-            winningMove = checkWin(board, x , y);
+            checkWin(board, x, y);
+            //winningMove = checkWin(board, x , y); // was used for debugging
         }
 
+        /* was used for debugging
         if(winningMove){
-            System.out.println("winner"); //just for now for testing
+            System.out.println("winner");
         }
+         */
+
         return ok ;
     }
 
@@ -81,15 +85,13 @@ public class QuaxGame {
         return winnerExists;
     }
 
-    // DOES NOT INCLUDE RHOMBI LOGIC YET
     public static boolean depthFirstSearch(QuaxBoard board, int x, int y, Colour colour, boolean[][] visited, boolean[] boardEdges){
 
         if(visited[x][y]) return false; //base case, cell already explored
 
-        visited[x][y] = true; //mark
+        visited[x][y] = true;
 
         // top to bottom edges
-        // 0, and 10 and the limits in our grid
         if (colour == Colour.BLACK) {
             if (y == 0) boardEdges[0] = true;        // top
             if (y == 10) boardEdges[1] = true;    // bottom
@@ -103,7 +105,7 @@ public class QuaxGame {
 
         if(boardEdges[0] && boardEdges[1]) return true; // base (win) case, both edges touched
 
-        //now check all (octagon only currently) neighbours
+        //Direct (non-diagonal) neighbours
 
         // Right neighbour
         if (board.inBoundsStone(x + 1, y) && board.getStone(x + 1, y) == colour) {
@@ -170,7 +172,7 @@ public class QuaxGame {
         return false; //return false if never found a win
     }
 
-    // Placeholder for pie rule logic
+
     public static void applyPieRule(QuaxBoard board) {
         board.setPieRuleEnabled();
         board.switchTurn();

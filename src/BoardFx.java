@@ -1,3 +1,4 @@
+import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,8 +11,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
-import javafx.animation.PauseTransition;
 import javafx.util.Duration;
+
 import java.util.HashMap;
 
 /**
@@ -762,6 +763,4 @@ public class BoardFx {
         updateScores();
         botMoveWithDelay(boardState);
     }
-
-
  }

@@ -8,18 +8,19 @@
 public class QuaxBoard {
     private static final int N = 11; // Board size: 11x11 octagonal stone cells
 
-     private boolean pieRuleEnabled; // Whether the pie rule is enable (To be implemented)
+     private boolean pieRuleEnabled;
      private Turn turn;
      private int turnsPassed;
      private boolean winnerExists;
 
      // Stores stones placed on the 11x11 grid of octagonal cells
      private final Colour[][] stones = new Colour[N][N];
+
      // Stores rhombus tiles placed between stones.
      // A rhombus at (x,y) lies between 4 octagons (x,y), (x+1,y), (x,y+1), (x+1,y+1)
      private final Colour[][] rhombi = new Colour[N-1][N-1];
 
-    public QuaxBoard(Theme boardTheme) {
+     public QuaxBoard(Theme boardTheme) {
         pieRuleEnabled = false;
         winnerExists = false;
         turn = turn.Player1;
@@ -73,20 +74,16 @@ public class QuaxBoard {
         turnsPassed += x;
     }
 
-
-    // Switches to other players turn after a successful move.
     public void switchTurn() {
 
         turn = (turn == Turn.Player1) ? Turn.Player2 : Turn.Player1;
         turnsPassed ++;
     }
 
-    // Maps the current turn to a colour
     public Colour currentPlayerColour() {
         return (turn == Turn.Player1) ? Colour.BLACK : Colour.WHITE;
     }
 
-    // Checks if (x,y) is a valid octagon coordinate
     public boolean inBoundsStone(int x, int y) {
         return x >= 0 && x < N && y >= 0 && y < N;
     }
@@ -96,8 +93,7 @@ public class QuaxBoard {
         return stones[x][y];
     }
 
-    // Attempts to place a octagon stone at (x,y)
-    // Only valid if cell is in board and unoccupied
+    //validates stone position
     public boolean placeStoneAt(int x, int y) {
         if (!inBoundsStone(x,y)) return false;
         if (stones[x][y] != Colour.NULL) return false;
@@ -107,7 +103,7 @@ public class QuaxBoard {
         return true;
     }
 
-    // Checks if (x,y) is a valid rhombus coordinate
+    //validates rhombus position
     public boolean inBoundsRhombus(int x, int y) {
         return x >= 0 && x < N-1 && y >= 0 && y < N-1;
     }
@@ -117,7 +113,6 @@ public class QuaxBoard {
         return rhombi[x][y];
     }
 
-    // Attempts to place a rhombus tile at (x,y)
     // Only places if:
     //  - the rhombus cell is empty, and
     //  - the current player has at least one diagonal pair of stones surrounding it
@@ -127,22 +122,17 @@ public class QuaxBoard {
 
         Colour c = currentPlayerColour();
 
-        // Unoriented rule: valid if either diagonal pair exists
-        boolean diag1 = stones[x][y] == c && stones[x+1][y+1] == c;   // "\"
-        boolean diag2 = stones[x+1][y] == c && stones[x][y+1] == c;   // "/"
-
+        boolean diag1 = stones[x][y] == c && stones[x+1][y+1] == c;
+        boolean diag2 = stones[x+1][y] == c && stones[x][y+1] == c;
         if (!diag1 && !diag2) return false;
 
         rhombi[x][y] = c;
         switchTurn();
         return true;
     }
-
-
     public void setPieRuleEnabled() {
             this.pieRuleEnabled = true;
     }
-
     public boolean isPieRuleEnabled(){
         return pieRuleEnabled;
     }

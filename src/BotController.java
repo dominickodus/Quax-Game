@@ -113,7 +113,7 @@ public class BotController implements Controller {
 
             if (connectsMine && blocksOpponent) {
                 lastStrategyUsed = "Rhombus Dual Strategy";
-                lastExplanation = "Bot chose this rhombus because it strengthens its own diagonal while also interfering with the opponent.";
+                lastExplanation = "Bot chose this rhombus as there was a blocking threat on its own diagonal";
             } else if (connectsMine) {
                 lastStrategyUsed = "Rhombus Connection Strategy";
                 lastExplanation = "Bot chose this rhombus because it strongly connects its diagonal stones.";
@@ -438,7 +438,7 @@ public class BotController implements Controller {
         int bonus = 0;
         Colour opponent = (me == Colour.BLACK) ? Colour.WHITE : Colour.BLACK;
 
-        // Friendly diagonal: (x,y) <-> (x+1,y+1)
+        // Friendly diagonal: (x,y) - (x+1,y+1)
         if (board.inBoundsStone(x, y) && board.inBoundsStone(x + 1, y + 1)) {
             if (board.getStone(x, y) == me && board.getStone(x + 1, y + 1) == me) {
                 bonus += 600;
@@ -448,7 +448,7 @@ public class BotController implements Controller {
             }
         }
 
-        // Friendly diagonal: (x+1,y) <-> (x,y+1)
+        // Friendly diagonal: (x+1,y) - (x,y+1)
         if (board.inBoundsStone(x + 1, y) && board.inBoundsStone(x, y + 1)) {
             if (board.getStone(x + 1, y) == me && board.getStone(x, y + 1) == me) {
                 bonus += 600;
