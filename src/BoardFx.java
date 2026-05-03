@@ -1,17 +1,19 @@
 import javafx.animation.PauseTransition;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.GaussianBlur;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
-import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
 import java.util.HashMap;
 
@@ -71,22 +73,42 @@ public class BoardFx {
         return String.valueOf((char) ('A' + i));
     }
 
+
     public BoardFx(Stage stage, QuaxBoard boardState, ThemeSet theme, Runnable onRestart, Turn forcedBotTurn, boolean testingMode) {
 
         this.theme = theme;
         this.onRestart = onRestart;
         this.testingMode = testingMode;
 
-        if (forcedBotTurn != null) {
-            botTurn = forcedBotTurn;
-        } else {
-            botTurn = Math.random() < 0.5 ? Turn.Player1 : Turn.Player2;
-        }
+        setupBotTurn(forcedBotTurn);
 
         if (!testingMode) {
             showStartDialog(boardState);
         }
 
+        setupRoot();
+        setupTopSection();
+        setupTurnBar(boardState);
+        setupBoardGrid(boardState);
+        setupScene(stage);
+
+        displayTurn(boardState);
+
+        if (boardState.getTurn() == botTurn) {
+            redrawBoard(boardState);
+            botMoveWithDelay(boardState);
+        }
+    }
+
+    private void setupBotTurn(Turn forcedBotTurn) {
+        if (forcedBotTurn != null) {
+            botTurn = forcedBotTurn;
+        } else {
+            botTurn = Math.random() < 0.5 ? Turn.Player1 : Turn.Player2;
+        }
+    }
+
+    private void setupRoot() {
         root = new BorderPane();
         root.setId("root");
         root.setBackground(theme.getBackground());
@@ -103,10 +125,8 @@ public class BoardFx {
         winText.setTextFill(Color.WHITESMOKE);
         winOverlay.setCenter(winText);
 
-        restartButton = new Button();
-        restartButton.setText("Restart");
+        restartButton = new Button("Restart");
         restartButton.setOnAction(e -> {
-            System.out.println("restarting");
             if (onRestart != null) onRestart.run();
         });
         restartButton.setDisable(true);
@@ -115,21 +135,35 @@ public class BoardFx {
         bottomBox.setAlignment(Pos.CENTER);
         bottomBox.setPadding(new Insets(10));
         winOverlay.setBottom(bottomBox);
+    }
 
-        StackPane rootPane = new StackPane(root, winOverlay);
-
-        // TITLE
+    private void setupTopSection() {
         Label title = new Label("QUAX (Human V Bot)");
-
         title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
         title.setTextFill(theme.getTextColour());
 
         VBox topSection = new VBox(title);
         topSection.setSpacing(10);
         topSection.setStyle("-fx-alignment: center; -fx-padding: 5 20 5 20;");
-        root.setTop(topSection);
 
-        // TURN INDICATOR
+        root.setTop(topSection);
+    }
+
+    private void setupScene(Stage stage) {
+        StackPane rootPane = new StackPane(root, winOverlay);
+
+        Scene scene = new Scene(rootPane, 900, 750);
+        stage.setTitle("Quax Game (Player vs. Player)");
+        stage.setScene(scene);
+
+        stage.setMinWidth(1000);
+        stage.setMinHeight(850);
+
+        stage.show();
+    }
+
+    private void setupTurnBar(QuaxBoard boardState) {
+
         HBox turnBox = new HBox(10);
         turnBox.setAlignment(Pos.CENTER);
         turnBox.setStyle("-fx-padding: 10;");
@@ -147,36 +181,17 @@ public class BoardFx {
         turnText.setMinWidth(140);
 
         pieRuleButton = new Button("Activate Pie Rule");
-        pieRuleButton.setStyle(
-                "-fx-background-color: #c6d8ee;" +
-                        "-fx-background-radius: 8;" +
-                        "-fx-border-color: #6b8fb3;" +
-                        "-fx-border-radius: 8;" +
-                        "-fx-border-width: 1;" +
-                        "-fx-font-size: 12px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-padding: 4 10 4 10;"
-        );
-        pieRuleButton.setId("pieButton");
         pieRuleButton.setVisible(false);
         pieRuleButton.setManaged(false);
-        pieRuleButton.setOnAction(e ->{
-                activatePie(boardState);
-        });
+        pieRuleButton.setOnAction(e -> activatePie(boardState));
 
         showStrategyButton = new Button("Show Strategy");
-        showStrategyButton.setId("showStrategyButton");
-
         hideStrategyButton = new Button("Hide Strategy");
-        hideStrategyButton.setId("hideStrategyButton");
+
         hideStrategyButton.setVisible(false);
         hideStrategyButton.setManaged(false);
 
         strategyLabel = new Label("No bot move yet.");
-        strategyLabel.setId("strategyLabel");
-        strategyLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-        strategyLabel.setWrapText(true);
-        strategyLabel.setMaxWidth(350);
         strategyLabel.setVisible(false);
         strategyLabel.setManaged(false);
 
@@ -203,10 +218,6 @@ public class BoardFx {
             setScoreVisibility(false);
         });
 
-        turnOctagon.setId("turnOctagon");
-        turnRhombus.setId("turnRhombus");
-        turnText.setId("turnText");
-
         turnBox.getChildren().addAll(
                 turnOctagon,
                 turnRhombus,
@@ -217,70 +228,42 @@ public class BoardFx {
                 hideStrategyButton,
                 strategyLabel
         );
-        root.setBottom(turnBox);
-        BorderPane.setAlignment(turnBox, Pos.CENTER);
 
-        // BOARD GRID (VIS+1 because row 0 and col 0 are for labels)
+        root.setBottom(turnBox);
+    }
+
+    private void setupBoardGrid(QuaxBoard boardState) {
+
         GridPane boardGrid = new GridPane();
         boardGrid.setAlignment(Pos.CENTER);
         boardGrid.setHgap(0);
         boardGrid.setVgap(0);
-        boardGrid.setGridLinesVisible(false); // turn on if debugging
 
-        // Top labels A–K aligned over octagons
         for (int x = 0; x < N; x++) {
             Label letterLabel = new Label(numToLetter(x));
             letterLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
             StackPane wrap = new StackPane(letterLabel);
             wrap.setMinSize(24, 35);
-            wrap.setStyle("-fx-border-width: 0 0 8 0; -fx-border-style: solid;");
-            GridPane.setMargin(wrap, new Insets(0, 0, 16, 0));
-            boardGrid.add(wrap, 1 + 2 * x, 0); //Place labels at col 1, 3 ,5 etc
+            boardGrid.add(wrap, 1 + 2 * x, 0);
         }
 
-        // Top border for cells without a letter label
-        for (int x = 0; x < N - 1; x++) {
-            StackPane wrap = new StackPane();
-            wrap.setMinSize(24, 35);
-            wrap.setStyle("-fx-border-width: 0 0 8 0; -fx-border-style: solid;");
-            GridPane.setMargin(wrap, new Insets(0, 0, 16, 0));
-            boardGrid.add(wrap, 2 + 2 * x, 0); //Place labels at col 2, 4 ,6 etc
-        }
-
-        // Left labels 1–11 aligned beside octagons
         for (int y = 0; y < N; y++) {
             Label numLabel = new Label(String.valueOf(y + 1));
             numLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
             StackPane wrap = new StackPane(numLabel);
             wrap.setMinSize(45, 24);
-            wrap.setStyle("-fx-border-width: 0 8 0 0; -fx-border-style: solid; -fx-border-color: white;");
-            GridPane.setMargin(wrap, new Insets(0, 16, 0, 0));
-
-            boardGrid.add(wrap, 0, 1 + 2 * y); // Place labels at col 1,3, 5
+            boardGrid.add(wrap, 0, 1 + 2 * y);
         }
 
-        // Left border for cells without a number label
-        for (int y = 0; y < N - 1; y++) {
-            StackPane wrap = new StackPane();
-            wrap.setMinSize(45, 24);
-            wrap.setStyle("-fx-border-width: 0 8 0 0; -fx-border-style: solid; -fx-border-color: white;");
-            GridPane.setMargin(wrap, new Insets(0, 16, 0, 0));
-            boardGrid.add(wrap, 0, 2 + 2 * y); //Place labels at col 2, 4 ,6 etc
-        }
-
-        // Place octagons and rhombi in a 21x21 visual grid
         for (int vx = 0; vx < V; vx++) {
             for (int vy = 0; vy < V; vy++) {
 
-                int col = vx + 1; // +1 because labels occupy row/col 0
+                int col = vx + 1;
                 int row = vy + 1;
 
-                // Octagon cells at even-even coordinates
                 if (vx % 2 == 0 && vy % 2 == 0) {
-
-                    // Convert visual grid coordinates to board coordinates
                     int bx = vx / 2;
                     int by = vy / 2;
 
@@ -288,145 +271,96 @@ public class BoardFx {
                     cell.setMinSize(36, 36);
 
                     Polygon oct = createOctagon(OCT_SIZE);
-                    oct.getStyleClass().add("octagon");
-                    Label scoreLabel = new Label();
-                    scoreLabel.setText("0");
+
+                    Label scoreLabel = new Label("");
                     scoreLabel.setVisible(false);
+                    scoreLabel.setMouseTransparent(true);
+
                     StackPane pane = new StackPane(oct, scoreLabel);
                     pane.setPickOnBounds(false);
-                    scoreLabel.setMouseTransparent(true);
+
                     cell.getChildren().add(pane);
-
-
-                    // On click: forward octagonal placement request to QuaxGame, then update UI
-                    cell.setOnMouseClicked(e -> {
-                        if (boardState.doesWinnerExist()) return;
-                        if (boardState.getTurn() == botTurn) return;
-
-                        boolean ok = QuaxGame.placeStone(boardState, bx, by);
-                        if (!ok) return;
-                        Colour owner = boardState.getStone(bx, by);
-                        oct.setFill(owner == Colour.BLACK ? Color.BLACK : Color.WHITE);
-
-                        displayTurn(boardState);
-
-                        if (!boardState.doesWinnerExist() && boardState.getTurn() == botTurn) {
-
-                            // Bot may choose pie rule immediately after the first move
-                            if (boardState.getTurnsPassed() == 1) {
-                                boolean usePieRule = Math.random() < .5;
-
-                                if (usePieRule) {
-                                    activatePie(boardState);
-                                    redrawBoard(boardState);
-                                    displayTurn(boardState);
-                                    updateStrategyDisplay();
-                                    updateScores();
-                                    return;
-                                }
-                            }
-
-                            redrawBoard(boardState);
-                            botMoveWithDelay(boardState);
-                        }
-                    });
-
+                    cell.setOnMouseClicked(e -> handleStoneClick(boardState, bx, by));
 
                     octagonNodes[bx][by] = cell;
                     boardGrid.add(cell, col, row);
                 }
 
-                // Rhombic tiles appear between four octagons at odd - odd coordinates
                 else if (vx % 2 == 1 && vy % 2 == 1) {
+                    int rx = vx / 2;
+                    int ry = vy / 2;
+
                     StackPane cell = new StackPane();
                     cell.setMinSize(24, 24);
 
                     Polygon rh = createRhombus(RHO_W, RHO_H);
-                    rh.getStyleClass().add("rhombus");
                     rh.setFill(Color.rgb(0, 0, 0, 0.08));
                     rh.setStroke(Color.rgb(0, 0, 0, 0.35));
                     rh.setStrokeWidth(1);
                     rh.setStrokeType(StrokeType.INSIDE);
 
-                    Label scoreLabel = new Label();
-                    scoreLabel.setText("");
+                    Label scoreLabel = new Label("");
                     scoreLabel.setVisible(false);
+                    scoreLabel.setMouseTransparent(true);
                     scoreLabel.setStyle("-fx-font-size: 9px; -fx-font-weight: bold;");
 
                     StackPane pane = new StackPane(rh, scoreLabel);
                     pane.setPickOnBounds(false);
-                    scoreLabel.setMouseTransparent(true);
 
                     cell.getChildren().add(pane);
-
-                    // Convert visual coordinates to rhombus grid coordinates
-                    final int rx = vx / 2;
-                    final int ry = vy / 2;
+                    cell.setOnMouseClicked(e -> handleRhombusClick(boardState, rx, ry));
 
                     rhombusNodes[rx][ry] = cell;
-
-                    // On click: forward rhombus placement request to QuaxGame, update UI
-                    cell.setOnMouseClicked(e -> {
-                        if (boardState.doesWinnerExist()) return;
-                        if (boardState.getTurn() == botTurn) return;
-
-                        boolean ok = QuaxGame.placeRhombus(boardState, rx, ry);
-                        if (!ok) return;
-
-                        Colour owner = boardState.getRhombus(rx, ry);
-                        rh.setFill(owner == Colour.BLACK ? Color.BLACK : Color.WHITE);
-
-                        displayTurn(boardState);
-
-                        if (!boardState.doesWinnerExist() && boardState.getTurn() == botTurn) {
-
-                            // Bot may choose pie rule immediately after the first move
-                            if (boardState.getTurnsPassed() == 1) {
-                                boolean usePieRule = Math.random() < .5; // use 1.0 while testing
-
-                                if (usePieRule) {
-                                    activatePie(boardState);
-                                    redrawBoard(boardState);
-                                    displayTurn(boardState);
-                                    updateStrategyDisplay();
-                                    updateScores();
-                                    return;
-                                }
-                            }
-
-                            redrawBoard(boardState);
-                            botMoveWithDelay(boardState);
-                        }
-
-                    });
-
                     boardGrid.add(cell, col, row);
                 }
-                // spacer cells (odd-even or even-odd)
             }
         }
 
         root.setCenter(boardGrid);
+    }
 
-        // Initial display for Turn 1;
+    private void handleStoneClick(QuaxBoard boardState, int x, int y) {
+        if (!isPlayerTurn(boardState)) return;
+
+        boolean ok = QuaxGame.placeStone(boardState, x, y);
+        if (!ok) return;
+
+        redrawBoard(boardState);
         displayTurn(boardState);
+        handleBotTurn(boardState);
+    }
+    private void handleRhombusClick(QuaxBoard boardState, int x, int y) {
+        if (!isPlayerTurn(boardState)) return;
 
-        Scene scene = new Scene(rootPane, 900, 750);
-        stage.setTitle("Quax Game (Player vs. Player)");
-        stage.setScene(scene);
+        boolean ok = QuaxGame.placeRhombus(boardState, x, y);
+        if (!ok) return;
 
-        /* Prevent window becoming smaller than the board layout */
-        stage.setMinWidth(1000);
-        stage.setMinHeight(850);
+        redrawBoard(boardState);
+        displayTurn(boardState);
+        handleBotTurn(boardState);
+    }
 
-        stage.show();
+private boolean isPlayerTurn(QuaxBoard boardState) {
+    return !boardState.doesWinnerExist() && boardState.getTurn() != botTurn;
+}
 
-        // If it is bot's turn at startup, let bot act
-        if (boardState.getTurn() == botTurn) {
-            redrawBoard(boardState);
-            botMoveWithDelay(boardState);
+private void handleBotTurn(QuaxBoard boardState) {
+    if (boardState.doesWinnerExist()) return;
+    if (boardState.getTurn() != botTurn) return;
+
+    if (boardState.getTurnsPassed() == 1) {
+        boolean usePieRule = Math.random() < 0.5;
+
+        if (usePieRule) {
+            activatePie(boardState);
+            return;
         }
     }
+
+    redrawBoard(boardState);
+    botMoveWithDelay(boardState);
+}
+
 
 
         private static Polygon createOctagon(double r) {
