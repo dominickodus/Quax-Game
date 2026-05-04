@@ -22,7 +22,6 @@ import java.util.HashMap;
  *  - Rendering tile grid
  *  - Displaying coordinate labels and current turn indicators
  *  - Forwarding clicks to QuaxGame and updating board.
- *
  *  The actual game state is stored in QuaxBoard.
  * */
 
