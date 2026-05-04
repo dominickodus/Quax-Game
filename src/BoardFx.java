@@ -14,7 +14,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
 import java.util.HashMap;
 
 /**
@@ -144,7 +143,7 @@ public class BoardFx {
 
         VBox topSection = new VBox(title);
         topSection.setSpacing(10);
-        topSection.setStyle("-fx-alignment: center; -fx-padding: 5 20 5 20;");
+        topSection.setStyle("-fx-alignment: center; -fx-padding: 15 20 5 20;");
 
         root.setTop(topSection);
     }
@@ -161,6 +160,7 @@ public class BoardFx {
 
         stage.show();
     }
+
 
     private void setupTurnBar(QuaxBoard boardState) {
 
@@ -245,7 +245,18 @@ public class BoardFx {
 
             StackPane wrap = new StackPane(letterLabel);
             wrap.setMinSize(24, 35);
+            wrap.setStyle("-fx-border-width: 0 0 8 0; -fx-border-style: solid;");
+            GridPane.setMargin(wrap, new Insets(0, 0, 16, 0));
             boardGrid.add(wrap, 1 + 2 * x, 0);
+        }
+
+        // Top border for grid spaces without a letter label
+        for (int x = 0; x < N - 1; x++) {
+            StackPane wrap = new StackPane();
+            wrap.setMinSize(24, 35);
+            wrap.setStyle("-fx-border-width: 0 0 8 0; -fx-border-style: solid;");
+            GridPane.setMargin(wrap, new Insets(0, 0, 16, 0));
+            boardGrid.add(wrap, 2 + 2 * x, 0);
         }
 
         for (int y = 0; y < N; y++) {
@@ -254,8 +265,20 @@ public class BoardFx {
 
             StackPane wrap = new StackPane(numLabel);
             wrap.setMinSize(45, 24);
+            wrap.setStyle("-fx-border-width: 0 8 0 0; -fx-border-style: solid; -fx-border-color: white;");
+            GridPane.setMargin(wrap, new Insets(0, 16, 0, 0));
             boardGrid.add(wrap, 0, 1 + 2 * y);
         }
+
+        // Left border for grid spaces without a number label
+        for (int y = 0; y < N - 1; y++) {
+            StackPane wrap = new StackPane();
+            wrap.setMinSize(45, 24);
+            wrap.setStyle("-fx-border-width: 0 8 0 0; -fx-border-style: solid; -fx-border-color: white;");
+            GridPane.setMargin(wrap, new Insets(0, 16, 0, 0));
+            boardGrid.add(wrap, 0, 2 + 2 * y);
+        }
+
 
         for (int vx = 0; vx < V; vx++) {
             for (int vy = 0; vy < V; vy++) {

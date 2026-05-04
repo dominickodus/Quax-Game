@@ -7,29 +7,17 @@
  */
 
 public class QuaxGame {
-
-    // Places an octagon stone at (x,y)
     public static boolean placeStone(QuaxBoard board, int x, int y) {
 
         boolean ok = board.placeStoneAt(x, y);
 
-        //boolean winningMove = false;
-
         if (board.getTurnsPassed()  >= 11 && ok){
             checkWin(board, x, y);
-            //winningMove = checkWin(board, x , y); // was used for debugging
         }
-
-        /* was used for debugging
-        if(winningMove){
-            System.out.println("winner");
-        }
-         */
 
         return ok ;
     }
 
-    // Places a rhombus stone at (x,y)
     public static boolean placeRhombus(QuaxBoard board, int x, int y) {
 
         boolean ok = board.placeRhombusAt(x, y);
@@ -42,7 +30,6 @@ public class QuaxGame {
 
             // Check both diagonals around this rhombus
 
-            // Diagonal 1: (x,y) ↔ (x+1,y+1)
             if (board.getStone(x, y) == colour) {
                 winningMove = checkWin(board, x, y);
             }
@@ -51,18 +38,12 @@ public class QuaxGame {
                 winningMove = checkWin(board, x + 1, y + 1);
             }
 
-            // Diagonal 2: (x+1,y) ↔ (x,y+1)
             if (!winningMove && board.getStone(x + 1, y) == colour) {
                 winningMove = checkWin(board, x + 1, y);
             }
-
             if (!winningMove && board.getStone(x, y + 1) == colour) {
                 winningMove = checkWin(board, x, y + 1);
             }
-        }
-
-        if (winningMove) {
-            System.out.println("winner");
         }
 
         return true;
@@ -133,7 +114,7 @@ public class QuaxGame {
 
         // ---- Diagonal neighbours through rhombi ----
 
-        // Down-right diagonal: (x,y) -> (x+1,y+1), using rhombus at (x,y)
+        // Down-right diagonal
         if (board.inBoundsStone(x + 1, y + 1)
                 && board.getStone(x + 1, y + 1) == colour
                 && board.inBoundsRhombus(x, y)
@@ -142,7 +123,7 @@ public class QuaxGame {
                 return true;
         }
 
-        // Up-left diagonal: (x,y) -> (x-1,y-1), using rhombus at (x-1,y-1)
+        // Up-left diagonal
         if (board.inBoundsStone(x - 1, y - 1)
                 && board.getStone(x - 1, y - 1) == colour
                 && board.inBoundsRhombus(x - 1, y - 1)
@@ -151,7 +132,7 @@ public class QuaxGame {
                 return true;
         }
 
-        // Up-right diagonal: (x,y) -> (x+1,y-1), using rhombus at (x, y-1)
+        // Up-right diagonal
         if (board.inBoundsStone(x + 1, y - 1)
                 && board.getStone(x + 1, y - 1) == colour
                 && board.inBoundsRhombus(x, y - 1)
@@ -160,7 +141,7 @@ public class QuaxGame {
                 return true;
         }
 
-        // Down-left diagonal: (x,y) -> (x-1,y+1), using rhombus at (x-1, y)
+        // Down-left diagonal
         if (board.inBoundsStone(x - 1, y + 1)
                 && board.getStone(x - 1, y + 1) == colour
                 && board.inBoundsRhombus(x - 1, y)

@@ -40,6 +40,8 @@ public class QuaxGameTest {
         assertEquals(Turn.Player2, board.getTurn());
     }
 
+
+
     // SR 5/6
     // Tests rhombic stones with upper left / lower right stones
     @Test
