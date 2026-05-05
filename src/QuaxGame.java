@@ -73,14 +73,14 @@ public class QuaxGame {
 
         // top to bottom edges
         if (colour == Colour.BLACK) {
-            if (y == 0) boardEdges[0] = true;        // top
-            if (y == 10) boardEdges[1] = true;    // bottom
+            if (y == 0) boardEdges[0] = true;
+            if (y == 10) boardEdges[1] = true;
         }
 
         //left to right
         if (colour == Colour.WHITE) {
-            if (x == 0) boardEdges[0] = true;        // left
-            if (x == 10) boardEdges[1] = true;    // right
+            if (x == 0) boardEdges[0] = true;
+            if (x == 10) boardEdges[1] = true;
         }
 
         if(boardEdges[0] && boardEdges[1]) return true; // base (win) case, both edges touched

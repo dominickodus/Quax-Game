@@ -22,7 +22,7 @@ public class Main extends Application {
         new BoardFx(stage, boardState, themeSet, () -> {
             stage.setScene(null);
             launchGame();
-        }, null, false);
+        });
     }
 
     public static void main(String[] args) {

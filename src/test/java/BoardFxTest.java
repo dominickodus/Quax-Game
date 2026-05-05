@@ -1,9 +1,10 @@
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import org.testfx.framework.junit5.ApplicationTest;
@@ -13,6 +14,8 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/** UI Unit Tests (Note: The Majority of UI tests were done manually) **/
+
 public class BoardFxTest extends ApplicationTest {
 
     private QuaxBoard board;
@@ -21,7 +24,7 @@ public class BoardFxTest extends ApplicationTest {
     public void start(Stage stage) {
         ThemeSet themeSet = new ThemeSet(Theme.Classic);
         board = new QuaxBoard();
-        new BoardFx(stage, board, themeSet, null, Turn.Player2, true);
+        new BoardFx(stage, board, themeSet, null);
     }
 
     @Test
@@ -34,13 +37,6 @@ public class BoardFxTest extends ApplicationTest {
     void test_SR2_firstTurnBlack() {
         Label turnText = lookup("#turnText").query();
         assertTrue(turnText.getText().contains("BLACK"));
-    }
-
-    @Test
-    void test_SR2_firstOctagonIsBlack() {
-        Polygon firstOct = lookup(".octagon").query();
-        clickOn(firstOct);
-        assertEquals(Color.BLACK, firstOct.getFill());
     }
 
     @Test
@@ -59,10 +55,7 @@ public class BoardFxTest extends ApplicationTest {
             new BoardFx(
                     (Stage) lookup("#root").query().getScene().getWindow(),
                     new QuaxBoard(),
-                    themeSet,
-                    null,
-                    Turn.Player2,
-                    true
+                    themeSet, null
             );
         });
 

@@ -17,7 +17,6 @@ public class QuaxBoard {
      private final Colour[][] stones = new Colour[N][N];
 
      // Stores rhombus tiles placed between stones.
-     // A rhombus at (x,y) lies between 4 octagons (x,y), (x+1,y), (x,y+1), (x+1,y+1)
      private final Colour[][] rhombi = new Colour[N-1][N-1];
 
      public QuaxBoard() {
@@ -92,8 +91,6 @@ public class QuaxBoard {
         if (!inBoundsStone(x,y)) return null;
         return stones[x][y];
     }
-
-    //validates stone position
     public boolean placeStoneAt(int x, int y) {
         if (!inBoundsStone(x,y)) return false;
         if (stones[x][y] != Colour.NULL) return false;
@@ -103,7 +100,6 @@ public class QuaxBoard {
         return true;
     }
 
-    //validates rhombus position
     public boolean inBoundsRhombus(int x, int y) {
         return x >= 0 && x < N-1 && y >= 0 && y < N-1;
     }
@@ -114,8 +110,7 @@ public class QuaxBoard {
     }
 
     // Only places if:
-    //  - the rhombus cell is empty, and
-    //  - the current player has at least one diagonal pair of stones surrounding it
+    //  - the rhombus cell is empty, and the current player has at least one diagonal pair of stones surrounding it
     public boolean placeRhombusAt(int x, int y) {
         if (!inBoundsRhombus(x,y)) return false;
         if (rhombi[x][y] != Colour.NULL) return false;

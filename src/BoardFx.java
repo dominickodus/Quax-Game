@@ -29,8 +29,6 @@ import java.util.Objects;
 public class BoardFx {
 
     private final ThemeSet theme;
-
-    private final boolean testingMode;
     private static final int N = 11;           // 11x11 octagon cells
     private static final int V = 2 * N - 1;  // 21x21 visual grid (octagons + rhombi)
 
@@ -66,18 +64,13 @@ public class BoardFx {
         return String.valueOf((char) ('A' + i));
     }
 
-    public BoardFx(Stage stage, QuaxBoard boardState, ThemeSet theme, Runnable onRestart, Turn forcedBotTurn, boolean testingMode) {
+    public BoardFx(Stage stage, QuaxBoard boardState, ThemeSet theme, Runnable onRestart) {
 
         this.theme = theme;
         this.onRestart = onRestart;
-        this.testingMode = testingMode;
 
-        setupBotTurn(forcedBotTurn);
 
-        if (!testingMode) {
-            showStartDialog(boardState);
-        }
-
+        setupBotTurn(null);
         setupRoot();
         setupTopSection();
         setupTurnBar(boardState);
@@ -166,10 +159,12 @@ public class BoardFx {
         arrow.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
         turnText = new Label();
+        turnText.setId("turnText");
         turnText.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         turnText.setMinWidth(140);
 
         pieRuleButton = new Button("Activate Pie Rule");
+        pieRuleButton.setId("pieButton");
         pieRuleButton.setVisible(false);
         pieRuleButton.setManaged(false);
         pieRuleButton.setOnAction(e -> activatePie(boardState));
@@ -283,6 +278,7 @@ public class BoardFx {
                     cell.setMinSize(36, 36);
 
                     Polygon oct = createOctagon(OCT_SIZE);
+                    oct.getStyleClass().add("octagon");
 
                     Label scoreLabel = new Label("");
                     scoreLabel.setVisible(false);
@@ -520,7 +516,6 @@ private void handleBotTurn(QuaxBoard boardState) {
     }
 
     private void botMoveWithDelay(QuaxBoard boardState) {
-        if (testingMode) return;
         if (boardState.getTurn() != botTurn || boardState.doesWinnerExist()) return;
 
         PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
@@ -671,15 +666,11 @@ private void handleBotTurn(QuaxBoard boardState) {
 
         QuaxGame.applyPieRule(boardState);
 
-        if (!testingMode) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Pie Rule Activated");
-            alert.setHeaderText("Pie Rule Used");
-            alert.setContentText("Sides have been swapped.");
-            alert.showAndWait();
-        }
-
-
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Pie Rule Activated");
+        alert.setHeaderText("Pie Rule Used");
+        alert.setContentText("Sides have been swapped.");
+        alert.showAndWait();
 
         if (botTurn == Turn.Player1) {
             botTurn = Turn.Player2;
