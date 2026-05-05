@@ -1,19 +1,18 @@
 import javafx.animation.PauseTransition;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.GaussianBlur;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
-import javafx.util.Duration;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -35,7 +34,6 @@ public class BoardFx {
     private static final int N = 11;           // 11x11 octagon cells
     private static final int V = 2 * N - 1;  // 21x21 visual grid (octagons + rhombi)
 
-    // Shape sizing
     private static final double OCT_SIZE = 30; // octagon radius
     private static final double RHO_W = 21;    // rhombus half-width
     private static final double RHO_H = 21;    // rhombus half-height
@@ -43,12 +41,10 @@ public class BoardFx {
     private BorderPane root;
     private BorderPane winOverlay;
 
-    // Win overlay components
     private Label winText;
     private Button restartButton;
     private final Runnable onRestart;
 
-    // Turn indicator UI components
     private Polygon turnOctagon;
     private Polygon turnRhombus;
     private Label turnText;
@@ -57,7 +53,7 @@ public class BoardFx {
     private Button hideStrategyButton;
     private Label strategyLabel;
     private boolean showStrategy = false;
-    Label arrow;
+    private Label arrow;
 
     // Bot controller for Player2
     private final BotController bot = new BotController();
@@ -67,11 +63,9 @@ public class BoardFx {
     private final StackPane[][] octagonNodes = new StackPane[N][N];
     private final StackPane[][] rhombusNodes = new StackPane[N - 1][N - 1];
 
-    // Helper for column label.
     private static String numToLetter(int i) {
         return String.valueOf((char) ('A' + i));
     }
-
 
     public BoardFx(Stage stage, QuaxBoard boardState, ThemeSet theme, Runnable onRestart, Turn forcedBotTurn, boolean testingMode) {
 
@@ -438,11 +432,9 @@ private void handleBotTurn(QuaxBoard boardState) {
         restartButton.setDisable(false);
         winOverlay.setVisible(true);
         winOverlay.setMouseTransparent(false);
-        System.out.println(restartButton.isDisable());
     }
 
     private void redrawBoard(QuaxBoard boardState) {
-        // Redraw stones
         for (int x = 0; x < N; x++) {
             for (int y = 0; y < N; y++) {
 
@@ -462,7 +454,6 @@ private void handleBotTurn(QuaxBoard boardState) {
             }
         }
 
-        // Redraw rhombi
         for (int x = 0; x < N - 1; x++) {
             for (int y = 0; y < N - 1; y++) {
 
@@ -679,7 +670,6 @@ private void handleBotTurn(QuaxBoard boardState) {
 
         QuaxGame.applyPieRule(boardState);
 
-        // Show simple message
         if (!testingMode) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Pie Rule Activated");

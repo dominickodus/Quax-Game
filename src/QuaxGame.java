@@ -52,11 +52,11 @@ public class QuaxGame {
     public static boolean checkWin(QuaxBoard board, int x, int y) {
         Colour colour = board.getStone(x, y);
 
-        boolean[][] visited = new boolean[11][11]; //keeping track of what cells have been visited in the recursion
+        boolean[][] visited = new boolean[11][11]; // keeping track of what cells have been visited in the recursion
 
-        boolean[] boardEdges = new boolean[2];  // if both these booleans are ture, that means both edges have been touched hence a valid chain is made
+        boolean[] boardEdges = new boolean[2];  // tracks whether both target edges have been reached
 
-        boolean winnerExists = depthFirstSearch(board, x,y,colour, visited, boardEdges); //recursive
+        boolean winnerExists = depthFirstSearch(board, x,y,colour, visited, boardEdges);
 
         if (winnerExists){
             board.setWinner();

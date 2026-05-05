@@ -126,7 +126,7 @@ public class BotController {
         int friendlyNeighbours = countFriendlyNeighbours(board, move.getX(), move.getY(), me);
         int opponentNeighbours = countFriendlyNeighbours(board, move.getX(), move.getY(), opponent);
 
-        int maxContiguous = getMaxContigious(move, board, opponent);
+        int maxContiguous = getMaxContiguous(move, board, opponent);
 
         if (maxContiguous >= 3) {
             lastStrategyUsed = "Defensive Strategy";
@@ -156,7 +156,7 @@ public class BotController {
         lastExplanation = "Bot chose the move that best improved its path across the board.";
     }
 
-    private int getMaxContigious(Move move, QuaxBoard board, Colour opponent) {
+    private int getMaxContiguous(Move move, QuaxBoard board, Colour opponent) {
         int vCount = countContinuousStones(board, move.getX(), move.getY(), 0, 1, opponent)
                 + countContinuousStones(board, move.getX(), move.getY(), 0, -1, opponent);
         int hCount = countContinuousStones(board, move.getX(), move.getY(), 1, 0, opponent)
@@ -184,12 +184,6 @@ public class BotController {
         if (move == null) {
             return;
         }
-
-        System.out.println(
-                move.isRhombus()
-                        ? "Bot chose RHOMBUS at (" + move.getX() + "," + move.getY() + ")"
-                        : "Bot chose STONE at (" + move.getX() + "," + move.getY() + ")"
-        );
 
         if (move.isRhombus()) {
             QuaxGame.placeRhombus(board, move.getX(), move.getY());
@@ -345,17 +339,13 @@ public class BotController {
         score += 10000 * (myBefore - myAfter);
         score += 10000 * (oppAfter - oppBefore);
 
-        int maxContiguous = getMaxContigious(move, board, opponent);
-
         if (!move.isRhombus()) {
-            getMaxContigious(move, board, opponent);
+            int maxContiguous = getMaxContiguous(move, board, opponent);
 
             if (maxContiguous >= 3) {
-                // breaks a potential line of >= 4
                 score += 720;
             }
         }
-
 
 
         // Small tie-breakers

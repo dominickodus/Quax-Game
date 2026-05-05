@@ -3,7 +3,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    Stage stage;
+    private Stage stage;
 
     @Override
     public void start(Stage stage) {
