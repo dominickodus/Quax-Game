@@ -2,16 +2,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 public class QuaxBoardTest {
 
-    //Each Test is mapped to its related SR
-
-    //SR 2.1
     @Test
     void test_SR2_initialTurnIsPlayer1() {
         QuaxBoard board = new QuaxBoard();
         assertEquals(Turn.Player1, board.getTurn());
     }
 
-    //SR 2.1 + 2.2
     @Test
     void test_SR2_switchTurnToggles() {
         QuaxBoard board = new QuaxBoard();
@@ -23,7 +19,6 @@ public class QuaxBoardTest {
         assertEquals(Turn.Player1, board.getTurn());
     }
 
-    //SR 2.1 + 2.2 consistency
     @Test
     void test_SR2_multipleTurnSwitches() {
         QuaxBoard board = new QuaxBoard();

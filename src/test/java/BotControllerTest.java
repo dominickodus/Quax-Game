@@ -132,13 +132,11 @@ public class BotControllerTest {
         QuaxBoard board = new QuaxBoard();
         BotController bot = new BotController();
 
-        // Builds vertical black chain
         for (int y = 0; y < 10; y++) {
             QuaxGame.placeStone(board, 5, y);
             QuaxGame.placeStone(board, 0, y);
         }
 
-        //Makes sure bot is Black and chooses the winning move
         while (board.getTurn() != Turn.Player1) {
             board.switchTurn();
         }
@@ -159,7 +157,6 @@ public class BotControllerTest {
         QuaxBoard board = new QuaxBoard();
         BotController bot = new BotController();
 
-        // Build white chain
         for (int x = 0; x < 10; x++) {
 
             while (board.getTurn() != Turn.Player2) {
@@ -173,14 +170,11 @@ public class BotControllerTest {
             QuaxGame.placeStone(board, x, 0);
         }
 
-        //force bot to be BLACK
         while (board.getTurn() != Turn.Player1) {
             board.switchTurn();
         }
 
-        // Bot should block at (10,5)
         Move move = bot.chooseMove(board);
-
         assertNotNull(move);
         assertEquals(10, move.getX());
         assertEquals(5, move.getY());
