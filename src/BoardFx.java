@@ -59,7 +59,6 @@ public class BoardFx {
     private final BotController bot = new BotController();
     private Turn botTurn;
 
-    // store references so later you can render model properly
     private final StackPane[][] octagonNodes = new StackPane[N][N];
     private final StackPane[][] rhombusNodes = new StackPane[N - 1][N - 1];
 
@@ -335,8 +334,8 @@ public class BoardFx {
     private void handleStoneClick(QuaxBoard boardState, int x, int y) {
         if (isPlayerTurn(boardState)) return;
 
-        boolean ok = QuaxGame.placeStone(boardState, x, y);
-        if (!ok) return;
+        boolean movePlaced = QuaxGame.placeStone(boardState, x, y);
+        if (!movePlaced) return;
 
         redrawBoard(boardState);
         displayTurn(boardState);
@@ -345,8 +344,8 @@ public class BoardFx {
     private void handleRhombusClick(QuaxBoard boardState, int x, int y) {
         if (isPlayerTurn(boardState)) return;
 
-        boolean ok = QuaxGame.placeRhombus(boardState, x, y);
-        if (!ok) return;
+        boolean movePlaced = QuaxGame.placeRhombus(boardState, x, y);
+        if (!movePlaced) return;
 
         redrawBoard(boardState);
         displayTurn(boardState);
@@ -401,7 +400,7 @@ private void handleBotTurn(QuaxBoard boardState) {
         }
 
 
-    // Update turn indicator based on current players turn
+        // Update turn indicator
         public void displayTurn(QuaxBoard boardState) {
         boolean blackToPlay = (boardState.getTurn() == Turn.Player1);
         Color c = blackToPlay ? Color.BLACK : Color.WHITE;
@@ -571,25 +570,30 @@ private void handleBotTurn(QuaxBoard boardState) {
         label.setTextFill(Color.rgb(0, 0, 0));
     }
 
+
     private void updateScores() {
-        // Reset all octagon text first
+        resetAllScores();
+        applyMoveScores();
+        highlightBestMoveScore();
+    }
+
+    private void resetAllScores() {
         for (int x = 0; x < N; x++) {
             for (int y = 0; y < N; y++) {
-                StackPane cell = octagonNodes[x][y];
-                resetText(cell);
+                resetText(octagonNodes[x][y]);
             }
         }
 
-        // Reset all rhombus text
         for (int x = 0; x < N - 1; x++) {
             for (int y = 0; y < N - 1; y++) {
-                StackPane cell = rhombusNodes[x][y];
-                resetText(cell);
+                resetText(rhombusNodes[x][y]);
             }
         }
+    }
 
-        // Update score text
+    private void applyMoveScores() {
         HashMap<Move, Integer> scores = bot.getLastScores();
+
         for (Move move : scores.keySet()) {
             int score = scores.get(move);
 
@@ -597,10 +601,8 @@ private void handleBotTurn(QuaxBoard boardState) {
                 StackPane cell = rhombusNodes[move.getX()][move.getY()];
                 if (cell == null) continue;
 
-                StackPane pane = (StackPane) cell.getChildren().getFirst();
-                Label label = (Label) pane.getChildren().get(1);
+                Label label = getScoreLabel(cell);
 
-                // Only show strong rhombus scores
                 if (score >= 200) {
                     label.setText(String.valueOf(score));
                 } else {
@@ -611,32 +613,31 @@ private void handleBotTurn(QuaxBoard boardState) {
                 StackPane cell = octagonNodes[move.getX()][move.getY()];
                 if (cell == null) continue;
 
-                StackPane pane = (StackPane) cell.getChildren().getFirst();
-                Label label = (Label) pane.getChildren().get(1);
+                Label label = getScoreLabel(cell);
                 label.setText(String.valueOf(score));
             }
         }
+    }
 
-        // Make the chosen move's score green
+    private void highlightBestMoveScore() {
         Move move = bot.getLastMove();
         if (move == null) return;
 
-        if (move.isRhombus()) {
-            StackPane cell = rhombusNodes[move.getX()][move.getY()];
-            if (cell == null) return;
+        StackPane cell = move.isRhombus()
+                ? rhombusNodes[move.getX()][move.getY()]
+                : octagonNodes[move.getX()][move.getY()];
 
-            StackPane pane = (StackPane) cell.getChildren().getFirst();
-            Label label = (Label) pane.getChildren().get(1);
-            label.setTextFill(Color.LIMEGREEN);
-        } else {
-            StackPane cell = octagonNodes[move.getX()][move.getY()];
-            if (cell == null) return;
+        if (cell == null) return;
 
-            StackPane pane = (StackPane) cell.getChildren().getFirst();
-            Label label = (Label) pane.getChildren().get(1);
-            label.setTextFill(Color.LIMEGREEN);
-        }
+        Label label = getScoreLabel(cell);
+        label.setTextFill(Color.LIMEGREEN);
     }
+
+    private Label getScoreLabel(StackPane cell) {
+        StackPane pane = (StackPane) cell.getChildren().getFirst();
+        return (Label) pane.getChildren().get(1);
+    }
+
 
     private void updateStrategyDisplay() {
         if (!showStrategy) return;

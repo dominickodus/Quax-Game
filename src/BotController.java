@@ -58,6 +58,7 @@ public class BotController {
         return bestMove;
     }
 
+    //Decides what Strategy to Display
     private void setMoveExplanation(QuaxBoard board, Move move) {
         if (move == null) {
             lastStrategyUsed = "No Move";
@@ -87,7 +88,6 @@ public class BotController {
             boolean connectsMine = false;
             boolean blocksOpponent = false;
 
-            // diagonal 1
             if (board.inBoundsStone(x, y) && board.inBoundsStone(x + 1, y + 1)) {
                 if (board.getStone(x, y) == me && board.getStone(x + 1, y + 1) == me) {
                     connectsMine = true;
@@ -97,7 +97,6 @@ public class BotController {
                 }
             }
 
-            // diagonal 2
             if (board.inBoundsStone(x + 1, y) && board.inBoundsStone(x, y + 1)) {
                 if (board.getStone(x + 1, y) == me && board.getStone(x, y + 1) == me) {
                     connectsMine = true;
@@ -310,6 +309,12 @@ public class BotController {
                 && a.isRhombus() == b.isRhombus();
     }
 
+
+    // Scores a move based on strategic impact:
+    // Prioritises winning moves and blocking opponent wins
+    // Uses pathfinding to minimise our path cost and increase opponent's
+    // Adds bonuses for connections, pressure, and rhombus opportunities
+
     private int scoreMove(QuaxBoard board, Move move) {
         Colour me = board.currentPlayerColour();
         Colour opponent = (me == Colour.BLACK) ? Colour.WHITE : Colour.BLACK;
@@ -335,7 +340,8 @@ public class BotController {
 
         int score = 0;
 
-        // Most important: improve my path and worsen theirs
+        // Most important heuristic:
+        // Improve the bot path to victory while worsening the human's path
         score += 10000 * (myBefore - myAfter);
         score += 10000 * (oppAfter - oppBefore);
 
