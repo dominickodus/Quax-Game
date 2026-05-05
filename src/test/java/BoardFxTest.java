@@ -20,7 +20,7 @@ public class BoardFxTest extends ApplicationTest {
     @Override
     public void start(Stage stage) {
         ThemeSet themeSet = new ThemeSet(Theme.Classic);
-        board = new QuaxBoard(Theme.Classic);
+        board = new QuaxBoard();
         new BoardFx(stage, board, themeSet, null, Turn.Player2, true);
     }
 
@@ -58,7 +58,7 @@ public class BoardFxTest extends ApplicationTest {
             ThemeSet themeSet = new ThemeSet(Theme.Jungle);
             new BoardFx(
                     (Stage) lookup("#root").query().getScene().getWindow(),
-                    new QuaxBoard(Theme.Classic),
+                    new QuaxBoard(),
                     themeSet,
                     null,
                     Turn.Player2,

@@ -8,7 +8,7 @@ public class QuaxGameTest {
     //SR2
     @Test
     void test_SR2placeStoneSwitchesTurn() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
 
         assertEquals(Turn.Player1, board.getTurn());
 
@@ -20,7 +20,7 @@ public class QuaxGameTest {
     //SR2
     @Test
     void test_SR2_PlaceStoneAlternateTurns() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
 
         QuaxGame.placeStone(board, 0, 0);
         QuaxGame.placeStone(board, 0, 1);
@@ -32,7 +32,7 @@ public class QuaxGameTest {
     // SR5/6
     @Test
     void test_SR5_InvalidPlacementRejected() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
 
         QuaxGame.placeStone(board, 0, 0); // Now player 2's turn
         QuaxGame.placeStone(board, 0, 0); // Invalid move, should still be player 2's turn
@@ -46,7 +46,7 @@ public class QuaxGameTest {
     // Tests rhombic stones with upper left / lower right stones
     @Test
     void test_SR5_RhombicStonePlacement1() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
 
         QuaxGame.placeStone(board, 0, 0); // Player 1
         QuaxGame.placeStone(board, 10, 10); // Player 2
@@ -61,7 +61,7 @@ public class QuaxGameTest {
     // Tests rhombic stones with upper right / lower left stones
     @Test
     void RhombicStonePlacement2() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
 
         QuaxGame.placeStone(board, 1, 0); // Player 1
         QuaxGame.placeStone(board, 10, 10); // Player 2
@@ -76,7 +76,7 @@ public class QuaxGameTest {
     // Assert rhombuses must be placed between octagonal stones
     @Test
     void test_SR5_InvalidRhombicStonePlacement() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         QuaxGame.placeRhombus(board, 0, 0); // Invalid, should be player 1's turn still
         assertEquals(Turn.Player1, board.getTurn());
     }
@@ -85,7 +85,7 @@ public class QuaxGameTest {
     // Assert rhombus cannot be placed on an occupied rhombus
     @Test
     void test_SR5_RhombicStoneValidation() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
 
         QuaxGame.placeStone(board, 0, 0); // Player 1
         QuaxGame.placeStone(board, 1, 0); // Player 2
@@ -102,7 +102,7 @@ public class QuaxGameTest {
 
     @Test
     void test_SR3_pieRuleEnabled(){
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         assertFalse(board.isPieRuleEnabled());
         QuaxGame.applyPieRule(board);
         assertTrue(board.isPieRuleEnabled());
@@ -110,7 +110,7 @@ public class QuaxGameTest {
 
     @Test
     void test_SR3_whiteAfterPie(){
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         board.switchTurn();
         assertEquals(board.getTurn(), Turn.Player2);
         QuaxGame.applyPieRule(board);
@@ -119,7 +119,7 @@ public class QuaxGameTest {
 
     @Test
     void test_SR3_turnCountAfterPie(){
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         board.switchTurn();
         assertEquals(board.getTurnsPassed(), 1);
         QuaxGame.applyPieRule(board);
@@ -128,7 +128,7 @@ public class QuaxGameTest {
 
     @Test
     void test_SR6_blackWin() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         for (int i = 0; i < 11; i++) {
             QuaxGame.placeStone(board, 0, i);
             QuaxGame.placeStone(board, 1, i);
@@ -138,7 +138,7 @@ public class QuaxGameTest {
 
     @Test
     void test_SR7_whiteWin() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         for (int i = 0; i < 11; i++) {
             QuaxGame.placeStone(board, i, 0);
             QuaxGame.placeStone(board, i, 1);
@@ -148,14 +148,14 @@ public class QuaxGameTest {
 
     @Test
     void test_SR6_falseWin() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         board.placeStoneAt(0, 0);
         assert(!board.doesWinnerExist());
     }
 
     @Test
     void test_SR6_blackWinWithRhombus() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         QuaxGame.placeStone(board, 0, 0); // Black
         QuaxGame.placeStone(board, 10, 0); // White
         QuaxGame.placeStone(board, 1, 1); // Black
@@ -171,7 +171,7 @@ public class QuaxGameTest {
 
     @Test
     void test_SR7_whiteWinWithRhombus() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         QuaxGame.placeStone(board, 10, 0);
         QuaxGame.placeStone(board, 0, 0); // White
         QuaxGame.placeStone(board, 10, 1);

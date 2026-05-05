@@ -7,14 +7,14 @@ public class QuaxBoardTest {
     //SR 2.1
     @Test
     void test_SR2_initialTurnIsPlayer1() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         assertEquals(Turn.Player1, board.getTurn());
     }
 
     //SR 2.1 + 2.2
     @Test
     void test_SR2_switchTurnToggles() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
 
         board.switchTurn();
         assertEquals(Turn.Player2, board.getTurn());
@@ -26,7 +26,7 @@ public class QuaxBoardTest {
     //SR 2.1 + 2.2 consistency
     @Test
     void test_SR2_multipleTurnSwitches() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
 
         for (int i = 0; i < 10; i++) {
             board.switchTurn();
@@ -36,7 +36,7 @@ public class QuaxBoardTest {
 
     @Test
     void test_Aux_turnCount(){
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         assertEquals(0, board.getTurnsPassed());
 
         board.switchTurn();
@@ -45,7 +45,7 @@ public class QuaxBoardTest {
 
     @Test
     void test_Aux_turnCountConsistent(){
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         for(int i = 0; i < 10 ; i++ ){
             assertEquals(i, board.getTurnsPassed());
             board.switchTurn();

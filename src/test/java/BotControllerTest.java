@@ -29,7 +29,7 @@ public class BotControllerTest {
 
     @Test
     void test_SR8_makeMoveSetsLastMove() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         BotController botController = new BotController();
 
         botController.makeMove(board);
@@ -39,7 +39,7 @@ public class BotControllerTest {
 
     @Test
     void test_SR8_ScoresPopulate() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         BotController botController = new BotController();
 
         botController.makeMove(board); // opening
@@ -50,7 +50,7 @@ public class BotControllerTest {
 
     @Test
     void test_SR8_openingStrategyIsUsedOnFirstMove() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         BotController bot = new BotController();
 
         bot.makeMove(board);
@@ -60,7 +60,7 @@ public class BotControllerTest {
 
     @Test
     void test_SR8_openingMoveIsCentral() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         BotController bot = new BotController();
 
         bot.makeMove(board);
@@ -78,7 +78,7 @@ public class BotControllerTest {
 
     @Test
     void test_SR8_pathfindingStrategyUsedAfterOpening() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         BotController bot = new BotController();
 
         bot.makeMove(board);
@@ -89,7 +89,7 @@ public class BotControllerTest {
 
     @Test
     void test_SR8_strategyExplanationIsSet() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         BotController bot = new BotController();
 
         bot.makeMove(board);
@@ -99,7 +99,7 @@ public class BotControllerTest {
 
     @Test
     void test_SR8_moveIsAppliedToBoard() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         BotController bot = new BotController();
 
         bot.makeMove(board);
@@ -114,7 +114,7 @@ public class BotControllerTest {
 
     @Test
     void test_SR8_moveIsWithinBounds() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         BotController bot = new BotController();
 
         bot.makeMove(board);
@@ -129,7 +129,7 @@ public class BotControllerTest {
 
     @Test
     void test_SR8_botChoosesWinningMove() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         BotController bot = new BotController();
 
         // Builds vertical black chain
@@ -156,7 +156,7 @@ public class BotControllerTest {
 
     @Test
     void test_SR8_botBlocksWinningMove() {
-        QuaxBoard board = new QuaxBoard((Theme) null);
+        QuaxBoard board = new QuaxBoard();
         BotController bot = new BotController();
 
         // Build white chain

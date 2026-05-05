@@ -1,7 +1,7 @@
 public class Move {
-    private int x;
-    private int y;
-    private boolean rhombus;
+    private final int x;
+    private final int y;
+    private final boolean rhombus;
 
     public Move(int x, int y, boolean rhombus) {
         this.x = x;

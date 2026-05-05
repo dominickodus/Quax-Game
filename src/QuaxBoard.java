@@ -20,10 +20,10 @@ public class QuaxBoard {
      // A rhombus at (x,y) lies between 4 octagons (x,y), (x+1,y), (x,y+1), (x+1,y+1)
      private final Colour[][] rhombi = new Colour[N-1][N-1];
 
-     public QuaxBoard(Theme boardTheme) {
+     public QuaxBoard() {
         pieRuleEnabled = false;
         winnerExists = false;
-        turn = turn.Player1;
+        turn = Turn.Player1;
 
 
         // init all board locations to empty

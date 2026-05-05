@@ -9,8 +9,6 @@ import javafx.scene.layout.BackgroundSize;
 
 public class ThemeSet {
     private Background background;
-    private String player1ColourText;
-    private String player2ColourText;
     private Color textColour;
 
     public ThemeSet (Theme theme) {
@@ -19,16 +17,12 @@ public class ThemeSet {
                 background = new Background(
                         new BackgroundFill(Color.rgb(224, 218, 148), null, null)
                 );
-                player1ColourText = "BLACK";
-                player2ColourText = "WHITE";
                 textColour = Color.BLACK;
                 break;
             case Alternate:
                 background = new Background(
                         new BackgroundFill(Color.rgb(140, 160, 210), null, null)
                 );
-                player1ColourText = "BLACK";
-                player2ColourText = "WHITE";
                 textColour = Color.WHITE;
                 break;
             case Jungle:
@@ -50,9 +44,6 @@ public class ThemeSet {
                 );
 
                 background = new Background(jungleBg);
-
-                player1ColourText = "BLACK";
-                player2ColourText = "WHITE";
                 textColour = Color.BLACK;
                 break;
             case Desert:
@@ -74,9 +65,6 @@ public class ThemeSet {
                 );
 
                 background = new Background(desertBg);
-
-                player1ColourText = "BLACK";
-                player2ColourText = "WHITE";
                 textColour = Color.WHITE;
                 break;
         }
@@ -84,14 +72,6 @@ public class ThemeSet {
 
     public Background getBackground() {
         return background;
-    }
-
-    public String getPlayer1ColourText() {
-        return player1ColourText;
-    }
-
-    public String getPlayer2ColourText() {
-        return player2ColourText;
     }
 
     public Color getTextColour() {

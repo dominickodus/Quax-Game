@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * JavaFX view for the Quax board.
@@ -28,9 +29,9 @@ import java.util.HashMap;
 
 public class BoardFx {
 
-    private ThemeSet theme;
+    private final ThemeSet theme;
 
-    private boolean testingMode;
+    private final boolean testingMode;
     private static final int N = 11;           // 11x11 octagon cells
     private static final int V = 2 * N - 1;  // 21x21 visual grid (octagons + rhombi)
 
@@ -45,7 +46,7 @@ public class BoardFx {
     // Win overlay components
     private Label winText;
     private Button restartButton;
-    private Runnable onRestart;
+    private final Runnable onRestart;
 
     // Turn indicator UI components
     private Polygon turnOctagon;
@@ -99,11 +100,7 @@ public class BoardFx {
     }
 
     private void setupBotTurn(Turn forcedBotTurn) {
-        if (forcedBotTurn != null) {
-            botTurn = forcedBotTurn;
-        } else {
-            botTurn = Math.random() < 0.5 ? Turn.Player1 : Turn.Player2;
-        }
+        botTurn = Objects.requireNonNullElseGet(forcedBotTurn, () -> Math.random() < 0.5 ? Turn.Player1 : Turn.Player2);
     }
 
     private void setupRoot() {
@@ -342,7 +339,7 @@ public class BoardFx {
     }
 
     private void handleStoneClick(QuaxBoard boardState, int x, int y) {
-        if (!isPlayerTurn(boardState)) return;
+        if (isPlayerTurn(boardState)) return;
 
         boolean ok = QuaxGame.placeStone(boardState, x, y);
         if (!ok) return;
@@ -352,7 +349,7 @@ public class BoardFx {
         handleBotTurn(boardState);
     }
     private void handleRhombusClick(QuaxBoard boardState, int x, int y) {
-        if (!isPlayerTurn(boardState)) return;
+        if (isPlayerTurn(boardState)) return;
 
         boolean ok = QuaxGame.placeRhombus(boardState, x, y);
         if (!ok) return;
@@ -363,7 +360,7 @@ public class BoardFx {
     }
 
 private boolean isPlayerTurn(QuaxBoard boardState) {
-    return !boardState.doesWinnerExist() && boardState.getTurn() != botTurn;
+    return boardState.doesWinnerExist() || boardState.getTurn() == botTurn;
 }
 
 private void handleBotTurn(QuaxBoard boardState) {
@@ -401,13 +398,13 @@ private void handleBotTurn(QuaxBoard boardState) {
         }
 
         private static Polygon createRhombus(double halfW, double halfH) {
-            Polygon p = new Polygon(
+            return new Polygon(
                     0.0, -halfH,
                     halfW, 0.0,
                     0.0, halfH,
                     -halfW, 0.0
             );
-            return p;        }
+        }
 
 
     // Update turn indicator based on current players turn
@@ -450,8 +447,8 @@ private void handleBotTurn(QuaxBoard boardState) {
             for (int y = 0; y < N; y++) {
 
                 StackPane cell = octagonNodes[x][y];
-                StackPane pane = (StackPane) cell.getChildren().get(0);
-                Polygon oct = (Polygon) pane.getChildren().get(0);
+                StackPane pane = (StackPane) cell.getChildren().getFirst();
+                Polygon oct = (Polygon) pane.getChildren().getFirst();
 
                 Colour owner = boardState.getStone(x, y);
 
@@ -472,8 +469,8 @@ private void handleBotTurn(QuaxBoard boardState) {
                 StackPane cell = rhombusNodes[x][y];
                 if (cell == null) continue;
 
-                StackPane pane = (StackPane) cell.getChildren().get(0);
-                Polygon rh = (Polygon) pane.getChildren().get(0);
+                StackPane pane = (StackPane) cell.getChildren().getFirst();
+                Polygon rh = (Polygon) pane.getChildren().getFirst();
 
                 Colour owner = boardState.getRhombus(x, y);
 
@@ -495,8 +492,8 @@ private void handleBotTurn(QuaxBoard boardState) {
                 StackPane cell = octagonNodes[x][y];
                 if (cell == null) continue;
 
-                StackPane pane = (StackPane) cell.getChildren().get(0);
-                Polygon oct = (Polygon) pane.getChildren().get(0);
+                StackPane pane = (StackPane) cell.getChildren().getFirst();
+                Polygon oct = (Polygon) pane.getChildren().getFirst();
                 oct.setStroke(Color.rgb(0, 0, 0, 0.55));
                 oct.setStrokeWidth(1.5);
             }
@@ -508,8 +505,8 @@ private void handleBotTurn(QuaxBoard boardState) {
                 StackPane cell = rhombusNodes[x][y];
                 if (cell == null) continue;
 
-                StackPane pane = (StackPane) cell.getChildren().get(0);
-                Polygon rhombus = (Polygon) pane.getChildren().get(0);
+                StackPane pane = (StackPane) cell.getChildren().getFirst();
+                Polygon rhombus = (Polygon) pane.getChildren().getFirst();
                 rhombus.setStroke(Color.rgb(0, 0, 0, 0.35));
                 rhombus.setStrokeWidth(1);
             }
@@ -518,24 +515,18 @@ private void handleBotTurn(QuaxBoard boardState) {
         Move lastMove = bot.getLastMove();
         if (lastMove == null) return;
 
-
+        StackPane cell;
         if (lastMove.isRhombus()) {
-            StackPane cell = rhombusNodes[lastMove.getX()][lastMove.getY()];
-            if (cell == null) return;
-
-            StackPane pane = (StackPane) cell.getChildren().get(0);
-            Polygon rhombus = (Polygon) pane.getChildren().get(0);
-            rhombus.setStroke(Color.LIMEGREEN);
-            rhombus.setStrokeWidth(3);
+            cell = rhombusNodes[lastMove.getX()][lastMove.getY()];
         } else {
-            StackPane cell = octagonNodes[lastMove.getX()][lastMove.getY()];
-            if (cell == null) return;
-
-            StackPane pane =  (StackPane) cell.getChildren().get(0);
-            Polygon oct = (Polygon) pane.getChildren().get(0);
-            oct.setStroke(Color.LIMEGREEN);
-            oct.setStrokeWidth(3);
+            cell = octagonNodes[lastMove.getX()][lastMove.getY()];
         }
+
+        if (cell == null) return;
+        StackPane pane = (StackPane) cell.getChildren().getFirst();
+        Polygon shape = (Polygon) pane.getChildren().getFirst();
+        shape.setStroke(Color.LIMEGREEN);
+        shape.setStrokeWidth(3);
     }
 
     private void botMoveWithDelay(QuaxBoard boardState) {
@@ -563,7 +554,7 @@ private void handleBotTurn(QuaxBoard boardState) {
                 StackPane cell = octagonNodes[x][y];
                 if (cell == null) continue;
 
-                StackPane pane = (StackPane) cell.getChildren().get(0);
+                StackPane pane = (StackPane) cell.getChildren().getFirst();
                 Label label = (Label) pane.getChildren().get(1);
                 label.setVisible(visible);
             }
@@ -573,11 +564,20 @@ private void handleBotTurn(QuaxBoard boardState) {
                 StackPane cell = rhombusNodes[x][y];
                 if (cell == null) continue;
 
-                StackPane pane = (StackPane) cell.getChildren().get(0);
+                StackPane pane = (StackPane) cell.getChildren().getFirst();
                 Label label = (Label) pane.getChildren().get(1);
                 label.setVisible(visible);
             }
         }
+    }
+
+    private void resetText(StackPane cell) {
+        if (cell == null) return;
+
+        StackPane pane = (StackPane) cell.getChildren().getFirst();
+        Label label = (Label) pane.getChildren().get(1);
+        label.setText("");
+        label.setTextFill(Color.rgb(0, 0, 0));
     }
 
     private void updateScores() {
@@ -585,12 +585,7 @@ private void handleBotTurn(QuaxBoard boardState) {
         for (int x = 0; x < N; x++) {
             for (int y = 0; y < N; y++) {
                 StackPane cell = octagonNodes[x][y];
-                if (cell == null) continue;
-
-                StackPane pane = (StackPane) cell.getChildren().get(0);
-                Label label = (Label) pane.getChildren().get(1);
-                label.setText("");
-                label.setTextFill(Color.rgb(0, 0, 0));
+                resetText(cell);
             }
         }
 
@@ -598,12 +593,7 @@ private void handleBotTurn(QuaxBoard boardState) {
         for (int x = 0; x < N - 1; x++) {
             for (int y = 0; y < N - 1; y++) {
                 StackPane cell = rhombusNodes[x][y];
-                if (cell == null) continue;
-
-                StackPane pane = (StackPane) cell.getChildren().get(0);
-                Label label = (Label) pane.getChildren().get(1);
-                label.setText("");
-                label.setTextFill(Color.rgb(0, 0, 0));
+                resetText(cell);
             }
         }
 
@@ -616,7 +606,7 @@ private void handleBotTurn(QuaxBoard boardState) {
                 StackPane cell = rhombusNodes[move.getX()][move.getY()];
                 if (cell == null) continue;
 
-                StackPane pane = (StackPane) cell.getChildren().get(0);
+                StackPane pane = (StackPane) cell.getChildren().getFirst();
                 Label label = (Label) pane.getChildren().get(1);
 
                 // Only show strong rhombus scores
@@ -630,7 +620,7 @@ private void handleBotTurn(QuaxBoard boardState) {
                 StackPane cell = octagonNodes[move.getX()][move.getY()];
                 if (cell == null) continue;
 
-                StackPane pane = (StackPane) cell.getChildren().get(0);
+                StackPane pane = (StackPane) cell.getChildren().getFirst();
                 Label label = (Label) pane.getChildren().get(1);
                 label.setText(String.valueOf(score));
             }
@@ -644,14 +634,14 @@ private void handleBotTurn(QuaxBoard boardState) {
             StackPane cell = rhombusNodes[move.getX()][move.getY()];
             if (cell == null) return;
 
-            StackPane pane = (StackPane) cell.getChildren().get(0);
+            StackPane pane = (StackPane) cell.getChildren().getFirst();
             Label label = (Label) pane.getChildren().get(1);
             label.setTextFill(Color.LIMEGREEN);
         } else {
             StackPane cell = octagonNodes[move.getX()][move.getY()];
             if (cell == null) return;
 
-            StackPane pane = (StackPane) cell.getChildren().get(0);
+            StackPane pane = (StackPane) cell.getChildren().getFirst();
             Label label = (Label) pane.getChildren().get(1);
             label.setTextFill(Color.LIMEGREEN);
         }
@@ -684,10 +674,6 @@ private void handleBotTurn(QuaxBoard boardState) {
 
         alert.showAndWait();
     }
-
-        public BorderPane getRoot() {
-            return root;
-        }
 
     public void activatePie(QuaxBoard boardState){
 

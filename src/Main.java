@@ -17,7 +17,7 @@ public class Main extends Application {
             System.exit(0);
         }
         ThemeSet themeSet = new ThemeSet(selectedTheme);
-        QuaxBoard boardState = new QuaxBoard(selectedTheme);
+        QuaxBoard boardState = new QuaxBoard();
 
         new BoardFx(stage, boardState, themeSet, () -> {
             stage.setScene(null);

@@ -1,8 +1,7 @@
 /**
  *  This acts as the rules layer for the game
- *
  *  QuaxGame acts between the UI (BoardFx) and the board state (QuaxBoard)>
- *  At the moment it mainly forwrads move requests to QuaxBoard, but will contain
+ *  At the moment it mainly forwards move requests to QuaxBoard, but will contain
  *  higher level game logic such as win detection etc.
  */
 
@@ -42,7 +41,7 @@ public class QuaxGame {
                 winningMove = checkWin(board, x + 1, y);
             }
             if (!winningMove && board.getStone(x, y + 1) == colour) {
-                winningMove = checkWin(board, x, y + 1);
+                checkWin(board, x, y + 1);
             }
         }
 
@@ -146,8 +145,7 @@ public class QuaxGame {
                 && board.getStone(x - 1, y + 1) == colour
                 && board.inBoundsRhombus(x - 1, y)
                 && board.getRhombus(x - 1, y) == colour) {
-            if (depthFirstSearch(board, x - 1, y + 1, colour, visited, boardEdges))
-                return true;
+            return (depthFirstSearch(board, x - 1, y + 1, colour, visited, boardEdges));
         }
 
         return false; //return false if never found a win

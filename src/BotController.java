@@ -1,9 +1,6 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.HashMap;
+import java.util.*;
 
-public class BotController implements Controller {
+public class BotController {
 
     private static final int INF = 1_000_000;
 
@@ -12,7 +9,6 @@ public class BotController implements Controller {
     private final HashMap<Move, Integer> moveScores = new HashMap<>();
     private Move lastMove;
 
-    @Override
     public boolean isBot() {
         return true;
     }
@@ -130,17 +126,7 @@ public class BotController implements Controller {
         int friendlyNeighbours = countFriendlyNeighbours(board, move.getX(), move.getY(), me);
         int opponentNeighbours = countFriendlyNeighbours(board, move.getX(), move.getY(), opponent);
 
-        int maxContiguous = 0;
-        int vCount = countContinuousStones(board, move.getX(), move.getY(), 0, 1, opponent)
-                + countContinuousStones(board, move.getX(), move.getY(), 0, -1, opponent);
-        int hCount = countContinuousStones(board, move.getX(), move.getY(), 1, 0, opponent)
-                + countContinuousStones(board, move.getX(), move.getY(), -1, 0, opponent);
-
-        if (opponent == Colour.BLACK) {
-            maxContiguous = vCount;
-        } else {
-            maxContiguous = hCount;
-        }
+        int maxContiguous = getMaxContigious(move, board, opponent);
 
         if (maxContiguous >= 3) {
             lastStrategyUsed = "Defensive Strategy";
@@ -170,13 +156,33 @@ public class BotController implements Controller {
         lastExplanation = "Bot chose the move that best improved its path across the board.";
     }
 
-    public boolean makeMove(QuaxBoard board) {
+    private int getMaxContigious(Move move, QuaxBoard board, Colour opponent) {
+        int vCount = countContinuousStones(board, move.getX(), move.getY(), 0, 1, opponent)
+                + countContinuousStones(board, move.getX(), move.getY(), 0, -1, opponent);
+        int hCount = countContinuousStones(board, move.getX(), move.getY(), 1, 0, opponent)
+                + countContinuousStones(board, move.getX(), move.getY(), -1, 0, opponent);
+
+        if (opponent == Colour.BLACK) {
+            return vCount;
+        } else {
+            return hCount;
+        }
+    }
+
+    private boolean wasPlaced(Move move, QuaxBoard copy) {
+        if (move.isRhombus()) {
+            return QuaxGame.placeRhombus(copy, move.getX(), move.getY());
+        } else {
+            return QuaxGame.placeStone(copy, move.getX(), move.getY());
+        }
+    }
+
+    public void makeMove(QuaxBoard board) {
         Move move = chooseMove(board);
         lastMove = move;
 
         if (move == null) {
-            System.out.println("Bot found no move");
-            return false;
+            return;
         }
 
         System.out.println(
@@ -186,9 +192,9 @@ public class BotController implements Controller {
         );
 
         if (move.isRhombus()) {
-            return QuaxGame.placeRhombus(board, move.getX(), move.getY());
+            QuaxGame.placeRhombus(board, move.getX(), move.getY());
         } else {
-            return QuaxGame.placeStone(board, move.getX(), move.getY());
+            QuaxGame.placeStone(board, move.getX(), move.getY());
         }
     }
 
@@ -233,13 +239,7 @@ public class BotController implements Controller {
     private boolean isWinningMove(QuaxBoard board, Move move) {
         QuaxBoard copy = new QuaxBoard(board);
 
-        boolean placed;
-        if (move.isRhombus()) {
-            placed = QuaxGame.placeRhombus(copy, move.getX(), move.getY());
-        } else {
-            placed = QuaxGame.placeStone(copy, move.getX(), move.getY());
-        }
-
+        boolean placed = wasPlaced(move, copy);
         if (!placed) return false;
 
         if (!move.isRhombus()) {
@@ -253,9 +253,7 @@ public class BotController implements Controller {
         if (copy.getStone(x, y) == colour && QuaxGame.checkWin(copy, x, y)) return true;
         if (copy.getStone(x + 1, y + 1) == colour && QuaxGame.checkWin(copy, x + 1, y + 1)) return true;
         if (copy.getStone(x + 1, y) == colour && QuaxGame.checkWin(copy, x + 1, y)) return true;
-        if (copy.getStone(x, y + 1) == colour && QuaxGame.checkWin(copy, x, y + 1)) return true;
-
-        return false;
+        return (copy.getStone(x, y + 1) == colour && QuaxGame.checkWin(copy, x, y + 1));
     }
 
     private boolean blocksOpponentImmediateWin(QuaxBoard board, Move myMove) {
@@ -274,13 +272,7 @@ public class BotController implements Controller {
         if (opponentWinningMoves.isEmpty()) return false;
 
         QuaxBoard afterMyMove = new QuaxBoard(board);
-        boolean placed;
-        if (myMove.isRhombus()) {
-            placed = QuaxGame.placeRhombus(afterMyMove, myMove.getX(), myMove.getY());
-        } else {
-            placed = QuaxGame.placeStone(afterMyMove, myMove.getX(), myMove.getY());
-        }
-
+        boolean placed = wasPlaced(myMove, afterMyMove);
         if (!placed) return false;
 
         List<Move> opponentMovesAfter = getAllValidMoves(afterMyMove);
@@ -353,22 +345,10 @@ public class BotController implements Controller {
         score += 10000 * (myBefore - myAfter);
         score += 10000 * (oppAfter - oppBefore);
 
-
+        int maxContiguous = getMaxContigious(move, board, opponent);
 
         if (!move.isRhombus()) {
-            int maxContiguous = 0;
-
-
-            // Check Vertical threat
-            int vCount = countContinuousStones(board, move.getX(), move.getY(), 0, 1, opponent) + countContinuousStones(board, move.getX(), move.getY(), 0, -1, opponent);
-            // Check Horizontal threat
-            int hCount = countContinuousStones(board, move.getX(), move.getY(), 1, 0, opponent) + countContinuousStones(board, move.getX(), move.getY(), -1, 0, opponent);
-
-            if (opponent == Colour.BLACK) {
-                maxContiguous = vCount;
-            } else {
-                maxContiguous = hCount;
-            }
+            getMaxContigious(move, board, opponent);
 
             if (maxContiguous >= 3) {
                 // breaks a potential line of >= 4
@@ -429,9 +409,7 @@ public class BotController implements Controller {
         }
 
         if (board.inBoundsRhombus(x, y - 1) && board.inBoundsStone(x + 1, y - 1) && board.getStone(x + 1, y - 1) == me) return true;
-        if (board.inBoundsRhombus(x - 1, y) && board.inBoundsStone(x - 1, y + 1) && board.getStone(x - 1, y + 1) == me) return true;
-
-        return false;
+        return (board.inBoundsRhombus(x - 1, y) && board.inBoundsStone(x - 1, y + 1) && board.getStone(x - 1, y + 1) == me);
     }
 
     private int rhombusConnectionStrength(QuaxBoard board, int x, int y, Colour me) {
@@ -469,7 +447,7 @@ public class BotController implements Controller {
             }
         }
 
-        PriorityQueue<Node> pq = new PriorityQueue<>((a, b) -> Integer.compare(a.cost, b.cost));
+        PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a.cost));
 
         if (player == Colour.WHITE) {
             for (int y = 0; y < 11; y++) {
