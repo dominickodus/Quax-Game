@@ -6,7 +6,7 @@ Built collaboratively with two other developers as a team project.
 
 ## About this project
 
-Quax is played on an 11×11 grid of stone cells, with diamond ("rhombus") tiles that can be placed between four adjacent stones to bridge diagonal gaps — this changes the connectivity graph mid-game, which makes win detection more involved than a standard Hex clone. Notable pieces of the implementation:
+Quax is played on an 11×11 grid of stone cells, with diamond ("rhombus") tiles that can be placed between four adjacent stones to bridge diagonal gaps, this changes the connectivity graph mid-game, which makes win detection more involved than a standard Hex clone. Notable pieces of the implementation:
 
 - **Win detection** — a depth-first search over the stone/rhombus graph that walks both orthogonal neighbours and diagonal neighbours unlocked by rhombus placement, checking connectivity between a colour's two target edges.
 - **Bot opponent** (`BotController.java`) — a heuristic move-scorer (immediate wins/blocks, diagonal connectivity, path improvement, pressure play) that also exposes a human-readable explanation of *why* it picked a move, surfaced in-app via "Show Strategy".
@@ -15,7 +15,7 @@ Quax is played on an 11×11 grid of stone cells, with diamond ("rhombus") tiles 
 
 ## Running it (Windows)
 
-The JavaFX SDK is bundled in this repo (`javafx-sdk-21.0.10/`), so no separate install is needed — just a JDK (17+) on your `PATH`.
+The JavaFX SDK is bundled in this repo (`javafx-sdk-21.0.10/`), no separate install is needed, just a JDK (17+) on your `PATH`.
 
 **Easiest way:** double-click `run.bat`, or from PowerShell:
 
