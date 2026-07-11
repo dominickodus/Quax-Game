@@ -14,6 +14,7 @@ out/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+!javafx-sdk-21.0.10/bin/
 
 ### NetBeans ###
 /nbproject/private/
