@@ -6,8 +6,11 @@ Built collaboratively with two other developers as a team project.
 
 Feel free to fork and tweak the bot or add any features as you wish. The scoring system in BotController.java is easy to modify and supports the addition of new strategies. Happy coding!
 
-![Mid-game board state showing Black's stones forming a diagonal chain toward a rhombus opportunity, with the "Show Strategy" panel explaining the bot's reasoning](src/assets/images/Screenshot%202026-07-12%20222628.png)
-*A game in progress: Black has built a diagonal chain of stones (E4–G3) toward the top-left, with the strategy panel showing the bot's reasoning for its last move ("chose this move to create a future rhombus opportunity"). Score values are shown per-cell in cells not yet occupied.*
+<p align="center">
+  <img src="src/assets/images/Screenshot%202026-07-12%20222628.png" alt="Mid-game board state showing Black's stones forming a diagonal chain toward a rhombus opportunity, with the Show Strategy panel explaining the bot's reasoning" width="500">
+  <br>
+  <sub><em>A game in progress: Black has built a diagonal chain of stones (E4–G3) toward the top-left, with the strategy panel explaining the bot's reasoning for its last move.</em></sub>
+</p>
 
 ## About this project
 
