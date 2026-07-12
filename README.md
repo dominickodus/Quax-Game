@@ -4,6 +4,9 @@ A Hex/Havannah-style connection board game, built from scratch in Java with a Ja
 
 Built collaboratively with two other developers as a team project.
 
+![Mid-game board state showing Black's stones forming a diagonal chain toward a rhombus opportunity, with the "Show Strategy" panel explaining the bot's reasoning](src/assets/images/Screenshot%202026-07-12%20222628.png)
+*A game in progress: Black has built a diagonal chain of stones (E4–G3) toward the top-left, with the strategy panel showing the bot's reasoning for its last move ("chose this move to create a future rhombus opportunity"). Score values are shown per-cell in cells not yet occupied.*
+
 ## About this project
 
 Quax is played on an 11×11 grid of stone cells, with diamond ("rhombus") tiles that can be placed between four adjacent stones to bridge diagonal gaps — this changes the connectivity graph mid-game, which makes win detection more involved than a standard Hex clone. Notable pieces of the implementation:
