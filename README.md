@@ -4,7 +4,7 @@ A Hex/Havannah-style connection board game, built from scratch in Java with a Ja
 
 Built collaboratively with two other developers as a team project.
 
-Feel free to fork and tweak the bot or add any features as you wish
+Feel free to fork and tweak the bot or add any features as you wish. The scoring system in BotController.java is easy to modify and supports the addition of new strategies. Happy coding!
 
 ## About this project
 
