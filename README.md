@@ -2,7 +2,7 @@
 
 A Hex/Havannah-style connection board game, built from scratch in Java with a JavaFX UI and a custom heuristic AI opponent.
 
-Built collaboratively with two other developers as a team project.
+Built collaboratively with two other developers (Alex Zuzuleac and Benjamin Power, University College Dublin) as a team project.
 
 Feel free to fork and tweak the bot or add any features as you wish. The scoring system in BotController.java is easy to modify and supports the addition/deletion of strategies. Happy coding!
 
